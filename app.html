@@ -22,39 +22,66 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   font-size:0.9rem; display:flex; flex-direction:column; gap:4px;
 }
 
-/* Data Center Info Tab */
+/* Data Center Info Tab - Small */
 #dc-info-tab {
-  position:absolute; top:calc(50% - 200px); left:10px; transform:translateY(-50%);
-  background:rgba(15,42,66,0.95); color:#fff; padding:12px 16px;
-  border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5); z-index:510;
-  width:240px; display:none; flex-direction:column; gap:6px; font-size:0.85rem;
-  cursor:pointer;
+  position: absolute;
+  top: calc(50% - 200px);
+  left: 10px;
+  transform: translateY(-50%);
+  background: rgba(15, 42, 66, 0.95);
+  color: #fff;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  z-index: 510;
+  width: 260px;           /* slightly bigger */
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
 }
-#dc-info-tab div { display:flex; align-items:center; gap:6px; }
-#dc-info-tab .dc-icon-small { width:18px; display:inline-block; text-align:center; }
 
-/* Expanded infographic style */
+#dc-info-tab div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#dc-info-tab .dc-icon-small {
+  width: 22px;            /* bigger icon container */
+  display: inline-block;
+  text-align: center;
+}
+
+#dc-info-tab .dc-icon-small i {
+  font-size: 18px;        /* slightly larger icons */
+}
+
+/* Data Center Info Tab - Expanded / Large */
 #dc-info-tab.large {
-  width:400px;
-  height:500px;
-  top:50px;
-  left:50%;
-  transform:translateX(-50%);
-  overflow-y:auto;
-  font-size:1rem;
-  padding:20px;
-  flex-direction:column;
-  gap:12px;
-}
-#dc-info-tab #close-dc-tab {
-  align-self:flex-end;
-  background:transparent;
-  border:none;
-  color:#fff;
-  font-size:1.2rem;
-  cursor:pointer;
+  width: 420px;
+  height: 520px;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow-y: auto;
+  font-size: 1rem;
+  padding: 24px;
+  flex-direction: column;
+  gap: 14px;
+  cursor: default;
 }
 
+/* Close Button */
+#dc-info-tab #close-dc-tab {
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
 /* More Insights panel for Water */
 #more-insights {
   position:absolute;
@@ -74,14 +101,16 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 }
 #more-insights .insight-item { cursor:pointer; display:flex; align-items:center; gap:6px; }
 
-/* Central Graph Panel */
+/* Central Graph Panel (Water vs Carbon) */
 #insight-graph-panel {
   position:absolute;
   top:50%;
   left:50%;
   transform:translate(-50%, -50%);
-  width:500px;
-  height:400px;
+  width:80vw;       /* increased width relative to viewport */
+  height:70vh;      /* increased height relative to viewport */
+  max-width:1200px; /* optional max limits */
+  max-height:900px;
   background:rgba(15,42,66,0.95);
   border-radius:12px;
   box-shadow:0 8px 20px rgba(0,0,0,0.5);
@@ -90,18 +119,50 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   flex-direction:column;
   z-index:600;
   padding:20px;
+  overflow:auto;     /* allow scrolling if needed */
 }
-#insight-graph-panel #close-graph-panel {
-  align-self:flex-end;
-  background:transparent;
-  border:none;
-  color:#fff;
-  font-size:1.2rem;
-  cursor:pointer;
-}
+
+/* Graph placeholder fills the panel */
 #graph-placeholder {
-  flex:1; display:flex; align-items:center; justify-content:center;
-  border:2px dashed #6EC1E4; color:#6EC1E4;
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px dashed #6EC1E4;
+  color:#6EC1E4;
+  width:100%;
+  height:100%;
+}
+
+/* Inner canvas fills placeholder */
+#graph-placeholder canvas {
+  width:100% !important;
+  height:100% !important;
+}
+
+/* Carbon Projection Modal */
+#carbon-projection-modal {
+  display: none;             /* Hidden initially */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 400px;
+  background: rgba(15,42,66,0.95);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  color: #fff;
+  z-index: 600;
+  padding: 20px;
+  flex-direction: column;
+}
+
+/* Make the chart canvas fill the modal */
+#carbonProjectionChart {
+  flex: 1;              /* Fill the parent container */
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Footer & Ribbon */
@@ -143,11 +204,47 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 <!-- DC Info Tab -->
 <div id="dc-info-tab">
   <button id="close-dc-tab">✖</button>
-  <div><span class="dc-icon-small"><i class="fas fa-database" style="color:cyan;"></i></span><strong id="dc-name">DC Name</strong></div>
-  <div><span class="dc-icon-small"><i class="fas fa-layer-group" style="color:#6EC1E4;"></i></span><strong>SizeRank:</strong> <span id="dc-size">N/A</span></div>
-  <div><span class="dc-icon-small"><i class="fas fa-bolt" style="color:#FACC15;"></i></span><strong>Power Source:</strong> <span id="dc-power">N/A</span></div>
-  <div><span class="dc-icon-small"><i class="fas fa-snowflake" style="color:#3B82F6;"></i></span><strong>Cooling Source:</strong> <span id="dc-cooling">N/A</span></div>
+
+  <div>
+    <span class="dc-icon-small"><i class="fas fa-database" style="color:cyan;"></i></span>
+    <strong id="dc-name">DC Name</strong>
+  </div>
+  <div>
+    <span class="dc-icon-small"><i class="fas fa-layer-group" style="color:#6EC1E4;"></i></span>
+    <strong>SizeRank:</strong> <span id="dc-size">N/A</span>
+  </div>
+  <div>
+    <span class="dc-icon-small"><i class="fas fa-bolt" style="color:#FACC15;"></i></span>
+    <strong>Power Source:</strong> <span id="dc-power">N/A</span>
+  </div>
+  <div>
+    <span class="dc-icon-small"><i class="fas fa-snowflake" style="color:#3B82F6;"></i></span>
+    <strong>Cooling Source:</strong> <span id="dc-cooling">N/A</span>
+  </div>
+
+  <!-- Extra fields in same style -->
+  <div>
+    <span class="dc-icon-small"><i class="fas fa-building" style="color:#FFD700;"></i></span>
+    <strong>Operator:</strong> <span id="dc-operator">N/A</span>
+  </div>
+  <div>
+    <span class="dc-icon-small"><i class="fas fa-city" style="color:#4ADE80;"></i></span>
+    <strong>City:</strong> <span id="dc-city">N/A</span>
+  </div>
+  <div>
+    <span class="dc-icon-small"><i class="fas fa-map-marker-alt" style="color:#3B82F6;"></i></span>
+    <strong>State:</strong> <span id="dc-state">N/A</span>
+  </div>
+  <div>
+    <span class="dc-icon-small"><i class="fas fa-dollar-sign" style="color:#FACC15;"></i></span>
+    <strong>Project Cost:</strong> <span id="dc-cost">N/A</span>
+  </div>
+  <div>
+    <span class="dc-icon-small"><i class="fas fa-info-circle" style="color:#FF6B6B;"></i></span>
+    <strong>Status:</strong> <span id="dc-status">N/A</span>
+  </div>
 </div>
+
 
 <!-- Monitor Panel -->
 <div id="monitor-panel">
@@ -163,13 +260,30 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   </label>
 </div>
 
-<!-- More Insights panel (Water) -->
 <div id="more-insights">
   <strong>More Insights</strong>
+
+  <!-- Existing Fuel Type -->
   <div class="insight-item" data-type="fuel">
     <i class="fas fa-gas-pump" style="color:yellow;"></i> Fuel Type
   </div>
+
+  <!-- Dynamically added Water Projections (via JS) -->
+  <div id="water-projection-tab" class="insight-item">
+    <i class="fas fa-water" style="color:#3B82F6;"></i> Water Projections
+  </div>
 </div>
+
+<!-- Carbon Projection Modal -->
+<div id="carbon-projection-modal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+     width:600px; height:400px; background:rgba(15,42,66,0.95); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5);
+     color:#fff; z-index:600; padding:20px; display:flex; flex-direction:column;">
+  <button id="close-carbon-projection" style="align-self:flex-end; background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✖</button>
+  <div style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Carbon Projections</div>
+  <canvas id="carbonProjectionChart"></canvas>
+</div>
+
+
 
 <!-- Central Graph Panel -->
 <div id="insight-graph-panel">
@@ -179,6 +293,17 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 </div>
 
 <div id="map"></div>
+
+<!-- Water Projection Modal -->
+<div id="water-projection-modal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+     width:600px; height:400px; background:rgba(15,42,66,0.95); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5);
+     color:#fff; z-index:600; padding:20px; flex-direction:column;">
+  <button id="close-water-projection" style="align-self:flex-end; background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✖</button>
+  <div style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Water Projections</div>
+  <canvas id="waterProjectionChart" width="560" height="300"></canvas>
+</div>
+
+
 <div id="footer-timestamp">Loading data...</div>
 <div id="hover-aqi"></div>
 <div class="legend" id="legend"></div>
@@ -199,6 +324,17 @@ let dcMarkers = [];
 let heatLayer = null;
 let currentLayer = "air";
 let initialLoad = true; // flag for first load
+let carbonMarkers = []; // keep track of CO2 circle markers
+let waterHeatLayer = null; // add at the top with other globals
+let waterMarkers = []; // global
+let waterPulseInterval = null; // store interval so we can clear it
+let aqiMarkers = []; // track AQI circle markers
+let powerData = [];
+let powerMarkers = [];
+let powerHeatLayer = null;
+let powerPulseInterval = null;
+
+
 
 // --- Legends ---
 function setLegend(layer){
@@ -223,6 +359,17 @@ function setLegend(layer){
       <div><span style="background:cyan"></span>Data Center</div>
     `;
   }
+  else if(layer === 'co2'){
+  legend.innerHTML = `
+    <div><span style="background:#00ff00"></span>Low CO₂</div>
+    <div><span style="background:#aaff00"></span>Moderate</div>
+    <div><span style="background:#ffff00"></span>High</div>
+    <div><span style="background:#ff8800"></span>Very High</div>
+    <div><span style="background:#ff0000"></span>Extreme</div>
+    <div><span style="background:cyan"></span>Data Center</div>
+  `;
+}
+
 }
 
 // --- Load Data Centers ---
@@ -232,23 +379,34 @@ async function loadDataCenters(){
     const data = await res.json();
     if(!data.data_centers || data.data_centers.length === 0) return;
 
+    // Remove old markers
     dcMarkers.forEach(m => map.removeLayer(m));
     dcMarkers = [];
 
     data.data_centers.forEach(dc => {
       if(!dc.lat || !dc.lon) return;
-      const size = dc.SizeRank ? Math.max(12, 28 - dc.SizeRank*2) : 16;
+
       const marker = L.marker([Number(dc.lat), Number(dc.lon)], {
-        icon: L.divIcon({className:'dc-icon', html:`<i class="fas fa-database" style="color:cyan;font-size:${size}px;"></i>`})
+        icon: L.divIcon({
+          className:'dc-icon',
+          html:`<i class="fas fa-database" style="color:cyan;font-size:12px;"></i>`
+        })
       }).addTo(map);
+
       marker.on('mouseover', ()=> {
         const tab = document.getElementById('dc-info-tab');
         tab.style.display='flex';
-        document.getElementById('dc-name').innerText = dc.Name||'N/A';
-        document.getElementById('dc-size').innerText = dc.SizeRank||'N/A';
-        document.getElementById('dc-power').innerText = dc.PowerSource||'N/A';
-        document.getElementById('dc-cooling').innerText = dc.CoolingSource||'N/A';
+        document.getElementById('dc-name').innerText = dc.name || 'N/A';
+        document.getElementById('dc-operator').innerText = dc.operator || 'N/A';
+        document.getElementById('dc-power').innerText = dc.powerSource || 'N/A';
+        document.getElementById('dc-cooling').innerText = dc.coolingSource || 'N/A';
+        document.getElementById('dc-city').innerText = dc.city || 'N/A';
+        document.getElementById('dc-state').innerText = dc.state || 'N/A';
+        document.getElementById('dc-size').innerText = dc.propertySizeAcres || 'N/A';
+        document.getElementById('dc-cost').innerText = dc.projectCost || 'N/A';
+        document.getElementById('dc-status').innerText = dc.status || 'N/A';
       });
+
       dcMarkers.push(marker);
     });
 
@@ -259,8 +417,12 @@ async function loadDataCenters(){
     }
 
     initialLoad = false;
-  } catch(err){ console.error(err); }
+
+  } catch(err){
+    console.error(err);
+  }
 }
+
 
 // --- Load AQI Heatmap ---
 async function loadAQIHeatmap(){
@@ -276,66 +438,243 @@ async function loadAQIHeatmap(){
 
     // Add invisible circle markers for tooltips **only if Air layer active**
     if(currentLayer==="air"){
+      aqiMarkers.forEach(m => map.removeLayer(m)); // clear old AQI markers
+      aqiMarkers = [];
+
       monitorData.forEach(m => {
-        L.circleMarker([m.lat, m.lon], {radius:0.1, opacity:0})
+        const marker = L.circleMarker([m.lat, m.lon], {radius:0.1, opacity:0})
           .addTo(map)
           .bindTooltip(`AQI: ${m.aqi}`, {direction:'top', className:'aqi-tooltip'});
+        aqiMarkers.push(marker); // store marker for later clearing
       });
     }
+
 
     document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
     setLegend('air');
   } catch(err){ console.error(err); }
 }
 
-// --- Load Water Footprint ---
-async function loadWaterHeatmap(){
+
+async function loadWaterHeatmap() {
   try {
     const res = await fetch('http://127.0.0.1:3000/api/water');
     const data = await res.json();
-    waterData = data.points||[];
-    if(waterData.length===0) return;
+    waterData = data.points || [];
+    if (waterData.length === 0) return;
 
-    if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; }
+    // Remove old heat & markers first
+    clearWaterLayer();
 
-    heatLayer = L.layerGroup().addTo(map);
-    const maxFootprint = Math.max(...waterData.map(p=>parseFloat(p.water_footprint)||0));
-    const circles=[];
+    const maxFootprint = Math.max(...waterData.map(p => parseFloat(p.water_footprint) || 0));
 
-    waterData.forEach(p=>{
-      const intensity = Math.min((parseFloat(p.water_footprint)||0)/maxFootprint,1.0);
-      const baseRadius = 4 + intensity*12;
-      let color = intensity<0.2?'#3B82F6':intensity<0.4?'#0EA5E9':intensity<0.6?'#06B6D4':intensity<0.8?'#22C55E':'#F87171';
 
-      const circle = L.circleMarker([p.lat,p.lon],{
+
+    const heatPoints = waterData.map(p => [p.lat, p.lon, (parseFloat(p.water_footprint)||0) / maxFootprint * 0.02]);
+    // scale down intensity drastically (2% of full)
+
+    waterHeatLayer = L.heatLayer(heatPoints, {
+      radius: 15,      // smaller radius
+      blur: 15,        // softer blur
+      minOpacity: 0.2, // lower opacity for overall soft look
+      gradient: {
+        0.0: '#0000ff',
+        0.25: '#00ffff',
+        0.5: '#00ff00',
+        0.75: '#ffff00',
+        1.0: '#ff0000'
+      }
+    }).addTo(map);
+
+
+
+    // --- Pulsating Circles ---
+    waterMarkers = []; // reset
+    waterData.forEach(p => {
+      const intensity = Math.min((parseFloat(p.water_footprint) || 0) / maxFootprint, 1.0);
+      const baseRadius = 4 + intensity * 12;
+      let color = intensity < 0.2 ? '#3B82F6' :
+                  intensity < 0.4 ? '#0EA5E9' :
+                  intensity < 0.6 ? '#06B6D4' :
+                  intensity < 0.8 ? '#22C55E' :
+                  '#F87171';
+
+      const circle = L.circleMarker([p.lat, p.lon], {
         radius: baseRadius,
         color: color,
         fillColor: color,
         fillOpacity: 0.5,
-        weight: 1
-      }).addTo(heatLayer);
+        weight: 1,
+        pane: 'markerPane'
+      }).addTo(map);
 
       circle.bindTooltip(`Water footprint: ${p.water_footprint.toFixed(2)} m³/MWh`, {direction:'top'});
-
-      circles.push({circle, baseRadius, intensity});
+      waterMarkers.push({circle, baseRadius, intensity});
     });
 
-    // Pulsing animation
+    // --- Pulsing animation ---
+    if (waterPulseInterval) clearInterval(waterPulseInterval);
     let scaleUp = true;
-    setInterval(()=>{
-      circles.forEach(obj=>{
-        const delta = 1 + obj.intensity*3;
-        const newRadius = scaleUp ? obj.baseRadius + delta : obj.baseRadius;
+    waterPulseInterval = setInterval(() => {
+      waterMarkers.forEach(obj => {
+        const delta = 1 + obj.intensity * 3;
+        const maxRadius = obj.baseRadius + 4;
+        const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
         obj.circle.setRadius(newRadius);
-        obj.circle.setStyle({ fillOpacity: 0.4 + 0.2*obj.intensity });
+        obj.circle.setStyle({ fillOpacity: 0.4 + 0.2 * obj.intensity });
       });
       scaleUp = !scaleUp;
     }, 800);
 
-    document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+    document.getElementById('footer-timestamp').innerText =
+      `Updated: ${new Date(data.timestamp).toLocaleString()}`;
     setLegend('water');
-  } catch(err){ console.error(err); }
+
+  } catch(err) {
+    console.error('Error loading water heatmap:', err);
+  }
 }
+
+async function loadPowerHeatmap() {
+  try {
+    const res = await fetch('http://127.0.0.1:3000/api/power');
+    const data = await res.json();
+    const powerData = data.points || [];
+    if (powerData.length === 0) return;
+
+    // Clear previous power layer
+    clearPowerLayer();
+
+    const maxPower = Math.max(...powerData.map(p => parseFloat(p.total_mwh) || 1));
+
+    // HeatLayer for power
+    const heatPoints = powerData.map(p => [p.lat, p.lon, (parseFloat(p.total_mwh) || 0) / maxPower * 0.02]);
+    powerHeatLayer = L.heatLayer(heatPoints, {
+      radius: 15,
+      blur: 15,
+      minOpacity: 0.2,
+      gradient: {0.0:'#ffff00', 0.5:'#ff8800', 1.0:'#ff0000'}
+    }).addTo(map);
+
+    // Pulsating markers
+    powerMarkers = [];
+    powerData.forEach(p => {
+      const intensity = Math.min((parseFloat(p.total_mwh)||0) / maxPower, 1);
+      const baseRadius = 4 + intensity * 10;
+
+      const marker = L.circleMarker([p.lat, p.lon], {
+        radius: baseRadius,
+        color:'#FACC15',
+        fillColor:'#FACC15',
+        fillOpacity:0.6,
+        weight:1
+      }).addTo(map);
+
+      marker.bindTooltip(
+        `Power: ${p.total_mwh.toLocaleString()} MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
+        {direction:'top', className:'aqi-tooltip'}
+      );
+
+      powerMarkers.push({marker, baseRadius, intensity});
+    });
+
+    // Pulsing animation
+    if(powerPulseInterval) clearInterval(powerPulseInterval);
+    let scaleUp = true;
+    powerPulseInterval = setInterval(() => {
+      powerMarkers.forEach(obj => {
+        const delta = 1 + obj.intensity * 3;
+        const maxRadius = obj.baseRadius + 4;
+        const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
+        obj.marker.setRadius(newRadius);
+        obj.marker.setStyle({ fillOpacity: 0.4 + 0.3 * obj.intensity });
+      });
+      scaleUp = !scaleUp;
+    }, 700);
+
+    document.getElementById('footer-timestamp').innerText =
+      `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+
+    setLegend('power');
+  } catch(err) {
+    console.error('Error loading power heatmap:', err);
+  }
+}
+
+
+async function loadCarbonHeatmap() {
+  try {
+    const res = await fetch('http://127.0.0.1:3000/api/carbon');
+    const data = await res.json();
+    const carbonData = data.points || [];
+    if (carbonData.length === 0) return;
+
+    // Remove previous heatLayer & markers
+    if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+    carbonMarkers.forEach(m => map.removeLayer(m));
+    carbonMarkers = [];
+
+    const maxCarbon = Math.max(...carbonData.map(p => parseFloat(p.carbon_footprint) || 1));
+
+    // HeatLayer points (same as before)
+    const heatPoints = carbonData.map(p => {
+      const raw = parseFloat(p.carbon_footprint) || 0;
+      let normalized = (raw / maxCarbon) * 100;
+      normalized = Math.min(normalized, 1);
+      return [p.lat, p.lon, normalized];
+    });
+
+    heatLayer = L.heatLayer(heatPoints, {
+      radius: 25,
+      blur: 30,
+      maxZoom: 10,
+      gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
+    }).addTo(map);
+
+    // Add pulsating carbon markers
+    const pulseMarkers = [];
+    carbonData.forEach(p => {
+      const raw = parseFloat(p.carbon_footprint) || 0;
+      let normalized = (raw / maxCarbon) * 100;
+      normalized = Math.min(normalized, 1);
+      const colorIntensity = `rgba(255,0,0,${0.6 + 0.4*normalized})`;
+
+      const marker = L.circleMarker([p.lat, p.lon], {
+        radius: 5,
+        fillColor: colorIntensity,
+        color: colorIntensity,
+        fillOpacity: 0.8,
+        weight: 0.5
+      }).addTo(map)
+        .bindTooltip(`CO₂: ${p.carbon_footprint.toLocaleString()} kg/MWh`, {direction:'top', className:'aqi-tooltip'});
+
+      carbonMarkers.push(marker);
+      pulseMarkers.push({ marker, baseRadius: 5, intensity: normalized });
+    });
+
+    // Pulsing animation
+        let scaleUp = true;
+        setInterval(() => {
+          pulseMarkers.forEach(obj => {
+            const delta = 2 + obj.intensity*2; // reduce growth
+            const maxRadius = obj.baseRadius + 3; // maximum allowed radius
+            const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
+            obj.marker.setRadius(newRadius);
+            obj.marker.setStyle({ fillOpacity: 0.5 + 0.3*obj.intensity }); // slightly less aggressive
+          });
+          scaleUp = !scaleUp;
+        }, 700);
+
+
+    document.getElementById('footer-timestamp').innerText =
+      `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+
+    setLegend('co2');
+
+  } catch(err) { console.error(err); }
+}
+
+
 
 // --- Initial Load ---
 loadDataCenters();
@@ -350,37 +689,233 @@ document.getElementsByName("monitor-layer").forEach(radio=>{
   });
 });
 
-// --- Nav ribbon ---
-document.querySelectorAll('.nav-item').forEach(item=>{
-  item.addEventListener('click',()=>{
-    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+// --- Nav ribbon (refactored) ---
+const panels = {
+  monitor: document.getElementById('monitor-panel'),
+  insights: document.getElementById('more-insights'),
+};
+
+function showPanelsFor(layer) {
+    panels.monitor.style.display = (layer === "air") ? "flex" : "none";
+    panels.insights.style.display = (layer === "water" || layer === "co2") ? "flex" : "none";
+
+    // Remove old projection tabs
+    ['water-projection-tab','water-vs-carbon-tab','carbon-projection-tab'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.remove();
+    });
+
+    if(layer === "water") {
+        addWaterProjectionTab();
+        addWaterVsCarbonTab(); // NEW
+    }
+    if(layer === "co2") addCarbonProjectionTab();
+}
+
+
+
+
+
+function clearWaterLayer() {
+  // Remove heatmap
+  if (waterHeatLayer) {
+    map.removeLayer(waterHeatLayer);
+    waterHeatLayer = null;
+  }
+
+  // Remove markers
+  if (waterMarkers && waterMarkers.length > 0) {
+    waterMarkers.forEach(obj => map.removeLayer(obj.circle));
+    waterMarkers = [];
+  }
+
+  // Clear animation
+  if (waterPulseInterval) {
+    clearInterval(waterPulseInterval);
+    waterPulseInterval = null;
+  }
+}
+
+function clearPowerLayer() {
+  if(powerHeatLayer) {
+    map.removeLayer(powerHeatLayer);
+    powerHeatLayer = null;
+  }
+  if(powerMarkers && powerMarkers.length > 0){
+    powerMarkers.forEach(obj => map.removeLayer(obj.marker));
+    powerMarkers = [];
+  }
+  if(powerPulseInterval){
+    clearInterval(powerPulseInterval);
+    powerPulseInterval = null;
+  }
+}
+
+function addWaterProjectionTab() {
+    // Remove existing tab if already present
+    const existingTab = document.getElementById('water-projection-tab');
+    if(existingTab) existingTab.remove();
+
+    const tab = document.createElement('div');
+    tab.id = 'water-projection-tab';
+    tab.className = 'insight-item';
+    tab.innerHTML = '<i class="fas fa-water" style="color:#3B82F6;"></i> Water Projections';
+    tab.style.cursor = 'pointer';
+
+    tab.addEventListener('click', () => {
+        document.getElementById('water-projection-modal').style.display = 'flex';
+        loadWaterProjectionChart();
+    });
+
+    document.getElementById('more-insights').appendChild(tab);
+}
+
+// --- NEW: Water vs Carbon Chart ---
+function addWaterVsCarbonTab() {
+    const existingTab = document.getElementById('water-vs-carbon-tab');
+    if(existingTab) existingTab.remove();
+
+    const tab = document.createElement('div');
+    tab.id = 'water-vs-carbon-tab';
+    tab.className = 'insight-item';
+    tab.innerHTML = '<i class="fas fa-chart-line" style="color:#22C55E;"></i> Water vs Carbon Chart';
+    tab.style.cursor = 'pointer';
+
+    tab.addEventListener('click', () => {
+    const panel = document.getElementById('insight-graph-panel');
+    panel.style.display = 'flex';
+    document.getElementById('graph-title').innerText = 'Water vs Carbon Comparison';
+    loadWaterBubbleChart();
+});
+
+
+    // Insert after Water Projection tab
+    const waterTab = document.getElementById('water-projection-tab');
+    if(waterTab) waterTab.insertAdjacentElement('afterend', tab);
+    else document.getElementById('more-insights').appendChild(tab);
+}
+
+function addCarbonProjectionTab() {
+    // Remove existing tab if already present
+    const existingTab = document.getElementById('carbon-projection-tab');
+    if(existingTab) existingTab.remove();
+
+    const tab = document.createElement('div');
+    tab.id = 'carbon-projection-tab';
+    tab.className = 'insight-item';
+    tab.innerHTML = '<i class="fas fa-cloud" style="color:red;"></i> Carbon Projections';
+    tab.style.cursor = 'pointer';
+
+    tab.addEventListener('click', () => {
+    const modal = document.getElementById('carbon-projection-modal');
+    modal.style.display = 'flex';
+
+    // Give the browser a tick to apply layout before drawing chart
+    setTimeout(() => loadCarbonProjectionChart(), 50);
+    });
+
+
+    document.getElementById('more-insights').appendChild(tab);
+}
+
+
+function clearHeatLayer() {
+  if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+
+  // Clear water
+  clearWaterLayer();
+
+  // Clear carbon markers
+  if (carbonMarkers && carbonMarkers.length > 0) {
+    carbonMarkers.forEach(m => map.removeLayer(m));
+    carbonMarkers = [];
+  }
+
+  // Clear AQI markers
+  if (aqiMarkers.length > 0) {
+    aqiMarkers.forEach(m => map.removeLayer(m));
+    aqiMarkers = [];
+  }
+
+  // Clear power markers & heatmap
+  clearPowerLayer();
+
+  document.getElementById('footer-timestamp').innerText = "Data layer not implemented yet";
+  setLegend(""); // clear legend
+}
+
+
+let carbonLoaded = false; // existing at top of script
+let powerLoaded = false;  // new flag for power layer
+
+function loadLayer(layer) {
+  switch (layer) {
+    case "water":
+      loadWaterHeatmap();
+      break;
+    case "air":
+      loadAQIHeatmap();
+      break;
+    case "co2":
+      loadCarbonHeatmap(); // fetch runs every time
+      break;
+    case "power":
+      loadPowerHeatmap();  // fetch power data
+      break;
+    default:
+      clearHeatLayer();
+      break;
+  }
+}
+
+
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    // Highlight active item
+    document.querySelector('.nav-item.active')?.classList.remove('active');
     item.classList.add('active');
+
     const layer = item.dataset.layer;
     currentLayer = layer;
 
-    document.getElementById('monitor-panel').style.display = (layer==="water")?"none":"flex";
-    document.getElementById('more-insights').style.display = (layer==="water")?"flex":"none";
+    showPanelsFor(layer);
 
-    if(layer==="water") loadWaterHeatmap();
-    else if(layer==="air") loadAQIHeatmap();
-    else if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; document.getElementById('footer-timestamp').innerText='Data layer not implemented yet'; setLegend(''); }
+    // Clear previous heatmap & markers before loading new layer
+    clearHeatLayer();
+
+    loadLayer(layer);
   });
 });
 
 // --- More Insights click ---
-document.querySelectorAll('#more-insights .insight-item').forEach(item=>{
-  item.addEventListener('click',()=>{
-    if(currentLayer!=="water") return;
-    const panel = document.getElementById('insight-graph-panel');
-    panel.style.display='flex';
-    loadFuelTypeGraph();
-  });
+document.querySelectorAll('#more-insights .insight-item').forEach(item => {
+    item.addEventListener('click', () => {
+        if (currentLayer !== "water" && currentLayer !== "co2") return;  // allow CO2 too
+        const panel = document.getElementById('insight-graph-panel');
+        panel.style.display = 'flex';
+
+        // Pass the layer type so loadFuelTypeGraph knows which API to call
+        loadFuelTypeGraph(currentLayer);
+    });
 });
+
 
 // --- Close Graph Panel ---
 document.getElementById('close-graph-panel').addEventListener('click',()=>{
   document.getElementById('insight-graph-panel').style.display='none';
 });
+
+// Close Water Projections Modal
+document.getElementById('close-water-projection').addEventListener('click', () => {
+    document.getElementById('water-projection-modal').style.display = 'none';
+});
+
+// Close Carbon Projections Modal
+document.getElementById('close-carbon-projection').addEventListener('click', () => {
+    document.getElementById('carbon-projection-modal').style.display = 'none';
+});
+
 
 // --- DC Info Tab toggle ---
 const dcTab = document.getElementById('dc-info-tab');
@@ -394,18 +929,25 @@ document.getElementById('close-dc-tab').addEventListener('click',e=>{
   dcTab.style.display='none';
 });
 
-// --- Fuel Type Graph ---
-async function loadFuelTypeGraph() {
+async function loadFuelTypeGraph(layerType = "water") {
     try {
-        const res = await fetch('http://127.0.0.1:3000/api/water_fuel');
+        // Decide which API to call based on layer
+        const apiUrl = layerType === "co2"
+            ? 'http://127.0.0.1:3000/api/carbon_fuel'
+            : 'http://127.0.0.1:3000/api/water_fuel';
+
+        const res = await fetch(apiUrl);
         const data = await res.json();
 
         const fuelMap = {};
         data.forEach(row => {
             const fuel = row.primary_fuel || 'Unknown';
-            const water = parseFloat(row.water_footprint) || 0;
+            const value = layerType === "co2"
+                ? parseFloat(row.carbon_footprint) || 0
+                : parseFloat(row.water_footprint) || 0;
+
             if (!fuelMap[fuel]) fuelMap[fuel] = 0;
-            fuelMap[fuel] += water;
+            fuelMap[fuel] += value;
         });
 
         const labels = Object.keys(fuelMap);
@@ -416,18 +958,20 @@ async function loadFuelTypeGraph() {
 
         const ctx = document.getElementById('fuel-chart').getContext('2d');
 
-        new Chart(ctx, {
+        if (window.fuelChart) window.fuelChart.destroy();
+
+        window.fuelChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Water Footprint (m³)',
+                    label: layerType === "co2" ? 'Carbon Footprint (kg CO₂)' : 'Water Footprint (m³)',
                     data: values,
-                    backgroundColor: ['#3B82F6', '#0EA5E9', '#06B6D4', '#22C55E', '#F87171', '#EAB308'],
+                    backgroundColor: ['#FF0000','#FF8800','#FFFF00','#22C55E','#06B6D4','#3B82F6'],
                     borderColor: '#fff',
                     borderWidth: 1,
                     borderRadius: 6,
-                    hoverBackgroundColor: ['#60A5FA', '#38BDF8', '#22D3EE', '#4ADE80', '#FB7185', '#FACC15'],
+                    hoverBackgroundColor: ['#FF5555','#FFAA55','#FFFF88','#4ADE80','#22D3EE','#60A5FA'],
                 }]
             },
             options: {
@@ -438,32 +982,310 @@ async function loadFuelTypeGraph() {
                         backgroundColor: '#111827',
                         titleColor: '#6EC1E4',
                         bodyColor: '#fff',
-                        titleFont: { weight: '600' },
+                        titleFont: { weight: '600' }
                     }
                 },
                 scales: {
-                        y: {
+                    y: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(255,255,255,0.1)' },
-                        ticks: {
-                            color: '#fff',
-                            callback: function(value) {
-                                if (value >= 1e6) return (value / 1e6).toFixed(1) + 'M';
-                                if (value >= 1e3) return (value / 1e3).toFixed(1) + 'K';
-                                return value;
-                            }
-                        },
-                        title: { display: true, text: 'Water Footprint (m³)', color:'#fff', font:{weight:'600'} }
-                    }
-
-                },
-                layout: {
-                    padding: { top: 10, bottom: 10, left: 5, right: 5 }
+                        ticks: { color: '#fff', callback: val => val >= 1e6 ? (val/1e6).toFixed(1)+'M' : val },
+                        title: { display: true, text: layerType === "co2" ? 'Carbon (kg CO₂)' : 'Water (m³)', color:'#fff' }
+                    },
+                    x: { ticks: { color: '#fff' } }
                 }
             }
         });
-    } catch (err) { console.error('Error loading fuel type graph', err); }
+    } catch (err) {
+        console.error('Error loading fuel type graph', err);
+        document.getElementById('graph-placeholder').innerHTML =
+            '<div style="color:#ccc; text-align:center;">Failed to load chart.</div>';
+    }
 }
+
+
+async function loadWaterProjectionChart() {
+    try {
+        const res = await fetch('http://127.0.0.1:3000/api/water_scenario');
+        const data = await res.json();
+        const points = data.points;
+        console.log("Water Scenario API returned:", data);
+
+        // --- Group points by year ---
+        const yearMap = {};
+        points.forEach(p => {
+            const year = p.year;
+            if (!yearMap[year]) yearMap[year] = { best: null, worst: null };
+            if (p.scenario.toLowerCase().includes("best")) yearMap[year].best = p.water_Mm3;
+            if (p.scenario.toLowerCase().includes("worst")) yearMap[year].worst = p.water_Mm3;
+        });
+
+        // Sort years
+        const years = Object.keys(yearMap).sort((a, b) => a - b);
+
+        // Create series arrays
+        const bestSeries = years.map(y => yearMap[y].best ?? 0);
+        const worstSeries = years.map(y => yearMap[y].worst ?? 0);
+
+        // --- Render Chart.js line chart ---
+        const ctx = document.getElementById('waterProjectionChart').getContext('2d');
+
+        // Only destroy if it’s a Chart.js instance
+        if (window.waterProjectionChart && window.waterProjectionChart instanceof Chart) {
+            window.waterProjectionChart.destroy();
+        }
+
+
+        window.waterProjectionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    {
+                        label: 'Best Water Projection',
+                        data: bestSeries,
+                        borderColor: 'green',
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Worst Water Projection',
+                        data: worstSeries,
+                        borderColor: 'red',
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#fff' } },
+                    tooltip: {
+                        backgroundColor: '#111827',
+                        titleColor: '#6EC1E4',
+                        bodyColor: '#fff',
+                        titleFont: { weight: '600' }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#fff' } },
+                    y: {
+                        ticks: { color: '#fff' },
+                        title: { display: true, text: 'Water (Mm³)', color: '#fff' }
+                    }
+                }
+            }
+        });
+
+    } catch (err) {
+        console.error('Error loading water projection chart', err);
+    }
+}
+
+async function loadCarbonProjectionChart() {
+    try {
+        const res = await fetch('http://127.0.0.1:3000/api/carbon_scenario');
+        const apiResponse = await res.json(); // 1. Renamed 'data' to 'apiResponse' for clarity
+        console.log("Carbon Scenario API returned:", apiResponse); // Check this log!
+        const points = apiResponse.data;
+
+        // --- FIX: Add a guard clause here ---
+        if (!points || !Array.isArray(points) || points.length === 0) {
+            console.error("Carbon data is missing or not an array:", data);
+            // Optional: Display a message in the modal instead of a chart
+            const chartContainer = document.getElementById('carbonProjectionChart').parentElement;
+            chartContainer.innerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; color:#ccc;">No Carbon Projection data available.</div>';
+            return; // Stop execution if data is bad or missing
+        }
+
+        // --- Group points by year ---
+        const yearMap = {};
+        points.forEach(p => {
+            const year = p.year;
+            if (!yearMap[year]) yearMap[year] = { best: null, worst: null };
+            if (p.scenario.toLowerCase().includes("best")) yearMap[year].best = p.carbon_MtCO2;
+            if (p.scenario.toLowerCase().includes("worst")) yearMap[year].worst = p.carbon_MtCO2;
+        });
+
+        // Sort years
+        const years = Object.keys(yearMap).sort((a,b)=>a-b);
+
+        // Create series arrays
+        const bestSeries = years.map(y => yearMap[y].best ?? 0);
+        const worstSeries = years.map(y => yearMap[y].worst ?? 0);
+
+        // --- Render Chart.js line chart ---
+        const ctx = document.getElementById('carbonProjectionChart').getContext('2d');
+
+        // Only destroy if it’s a Chart.js instance
+        if (window.carbonProjectionChart && window.carbonProjectionChart instanceof Chart) {
+            window.carbonProjectionChart.destroy();
+        }
+
+        window.carbonProjectionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    {
+                        label: 'Best Carbon Projection',
+                        data: bestSeries,
+                        borderColor: 'green',
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Worst Carbon Projection',
+                        data: worstSeries,
+                        borderColor: 'red',
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,  // important for modal
+                plugins: {
+                    legend: { labels: { color: '#fff' } },
+                    tooltip: {
+                        backgroundColor: '#111827',
+                        titleColor: '#6EC1E4',
+                        bodyColor: '#fff',
+                        titleFont: { weight: '600' }
+                    }
+                },
+                scales: {
+    x: {
+        display: true,
+        ticks: {
+            color: '#fff',
+            font: { size: 12 },
+
+        },
+        title: {
+            display: true,
+            text: 'Year',
+            color: '#fff',
+            font: { size: 14 },
+            padding: { top: 0, bottom: 5 }
+        }
+    },
+    y: {
+        display: true,
+        ticks: { color: '#fff' },
+        title: {
+            display: true,
+            text: 'Carbon (MtCO₂)',
+            color: '#fff'
+        }
+    }
+},
+                layout: {
+        padding: { bottom: 50}
+    }
+
+            }
+        });
+
+    } catch(err) {
+        console.error('Error loading carbon projection chart', err);
+    }
+}
+
+async function loadWaterBubbleChart() {
+    try {
+        const res = await fetch('http://127.0.0.1:3000/api/water_carbon_data');
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+            document.getElementById('graph-placeholder').innerHTML =
+                '<div style="color:#ccc; text-align:center;">No water/carbon data available.</div>';
+            return;
+        }
+
+        const maxWater = Math.max(...data.map(d => d.water_footprint));
+
+        const chartData = data.map(d => ({
+            x: d.total_mwh,
+            y: d.scarcity_factor,
+            r: Math.sqrt((d.water_footprint / maxWater * 300) / Math.PI),
+            raw: d,  // keep full data for tooltip
+            backgroundColor: "rgba(50,50,50,0.7)",
+            borderColor: "#fff",
+            borderWidth: 1
+        }));
+
+        const placeholder = document.getElementById('graph-placeholder');
+        placeholder.style.width = '1200px';
+        placeholder.style.height = '800px';
+        placeholder.innerHTML = '<canvas id="water-bubble-chart"></canvas>';
+
+        const ctx = document.getElementById('water-bubble-chart').getContext('2d');
+
+        if (window.waterBubbleChart) window.waterBubbleChart.destroy();
+
+        window.waterBubbleChart = new Chart(ctx, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: '',
+                    data: chartData
+                }]
+            },
+            options: {
+                responsive: true,
+
+                interaction: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+
+                plugins: {
+                    tooltip: {
+                        title: () => '',
+                        callbacks: {
+                            label: function(context) {
+                                const d = context.raw;
+                                return `Scarcity: ${d.scarcity_factor}\nMWh: ${d.total_mwh.toLocaleString()}`;
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        type: 'linear',
+                        min: 0,
+                        max: 2.1e7,
+                        title: { display: true, text: 'Electricity used by data centers (MWh)', color: '#fff' },
+                        ticks: { color: '#fff' }
+                    },
+                    y: {
+                        min: 0,
+                        max: 105,
+                        title: { display: true, text: 'Water scarcity factor', color: '#fff' },
+                        ticks: { color: '#fff' }
+                    }
+                }
+            }
+        });
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById('graph-placeholder').innerHTML =
+            '<div style="color:#ccc; text-align:center;">Failed to load chart.</div>';
+    }
+}
+
+
+
+
+
+
+
+
+
 </script>
 </body>
 </html>
