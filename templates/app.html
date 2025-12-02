@@ -516,13 +516,13 @@ async function loadAQIHeatmap(){
 
     // --- HeatLayer (commented out) ---
     
-    const points = monitorData.map(m=>[m.lat, m.lon, Math.min(m.aqi/500,0.6)]);
-    heatLayer = L.heatLayer(points,{
-      radius:15,
-      blur:8,
-      maxZoom:10,
-      gradient:{0:'green',0.3:'yellow',0.6:'orange',0.8:'red',1:'purple'}
-    }).addTo(map);
+    // const points = monitorData.map(m=>[m.lat, m.lon, Math.min(m.aqi/500,0.6)]);
+    // heatLayer = L.heatLayer(points,{
+    //   radius:15,
+    //   blur:8,
+    //   maxZoom:10,
+    //   gradient:{0:'green',0.3:'yellow',0.6:'orange',0.8:'red',1:'purple'}
+    // }).addTo(map);
     
 
     // Clear old AQI markers
