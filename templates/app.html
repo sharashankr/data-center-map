@@ -425,23 +425,10 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   <canvas id="waterProjectionChart" width="560" height="300"></canvas>
 </div>
 
-<!-- Filters -->
-<select id="state-filter">
-  <option value="all">All States</option>
-</select>
-
-<select id="fuel-filter">
-  <option value="all">All Fuels</option>
-</select>
-
-<select id="subbasin-filter">
-  <option value="all">All Subbasins</option>
-</select>
-
-<style>
-  /* Filters styling */
-  #state-filter, #fuel-filter, #subbasin-filter {
+<!-- State Filter -->
+<select id="state-filter" style="
     position: absolute;
+    top: 35%;
     right: 20px;
     z-index: 550;
     background: rgba(30,41,59,0.95);
@@ -450,40 +437,47 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
     padding: 6px 10px;
     border: none;
     font-size: 0.9rem;
-    display: none; /* hide by default */
-  }
+">
+  <option value="all">All States</option>
+</select>
 
-  /* Adjusted top positions to be slightly higher */
-  #state-filter { top: 25%; }
-  #fuel-filter { top: 33%; }
-  #subbasin-filter { top: 41%; width: 150px; max-width: 150px; }
-</style>
+<!-- Fuel Filter -->
+<select id="fuel-filter" style="
+    position: absolute;
+    top: 45%;
+    right: 20px;
+    z-index: 550;
+    background: rgba(30,41,59,0.95);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: none;
+    font-size: 0.9rem;
+">
+  <option value="all">All Fuels</option>
+</select>
 
-<script>
-  const filterIds = ['state-filter', 'fuel-filter', 'subbasin-filter'];
+<!-- Subbasin Filter -->
+<select id="subbasin-filter" style="
+    position: absolute;
+    top: 55%;
+    right: 20px;
+    z-index: 550;
+    background: rgba(30,41,59,0.95);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: none;
+    font-size: 0.9rem;
+    width: 150px;       /* fixed width */
+    max-width: 150px;   /* ensures it doesn't grow */
+    overflow: hidden;   /* hides overflowing text */
+    text-overflow: ellipsis; /* show "..." if too long */
+    white-space: nowrap; /* keep single line */
+">
+  <option value="all">All Subbasins</option>
+</select>
 
-  function toggleFilters(layer) {
-    const show = ['Water', 'Power', 'CO2'].includes(layer);
-    filterIds.forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.style.display = show ? 'block' : 'none';
-    });
-  }
-
-  // Example layer selection buttons (replace with your actual layer logic)
-  const layerButtons = document.querySelectorAll('.layer-btn'); // hypothetical buttons
-
-  layerButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const layer = btn.dataset.layer; // e.g., 'AirQuality', 'Water', 'CO2', 'Power'
-      toggleFilters(layer);
-    });
-  });
-
-  // Initialize filters based on default layer
-  let defaultLayer = 'AirQuality'; // change if default is different
-  toggleFilters(defaultLayer);
-</script>
 
 
 
