@@ -126,7 +126,9 @@ def load_water_data():
                     "lon": lon,
                     "water_footprint": water_fp,
                     "subbasin": row.get("subbasin", ""),
-                    "state": row.get("plant_state", "")
+                    "state": row.get("plant_state", ""),
+                    "primary_fuel": row.get("primary_fuel", "")
+                    
                 })
                 count += 1
             except Exception:
