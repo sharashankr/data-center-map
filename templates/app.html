@@ -758,7 +758,7 @@ async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", sel
 
 async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
   try {
-    const res = await fetch('http://127.0.0.1:3000/api/power');
+    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/power');
     const data = await res.json();
     let powerData = data.points || [];
     if (!powerData.length) return;
@@ -926,7 +926,7 @@ async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", sel
 
 async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
   try {
-    const res = await fetch('http://127.0.0.1:3000/api/carbon');
+    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/carbon');
     const data = await res.json();
     let carbonData = data.points || [];
     if (!carbonData.length) return;
