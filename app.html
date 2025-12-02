@@ -327,12 +327,12 @@ let initialLoad = true; // flag for first load
 let carbonMarkers = []; // keep track of CO2 circle markers
 let waterHeatLayer = null; // add at the top with other globals
 let waterMarkers = []; // global
-let waterPulseInterval = null; // store interval so we can clear it
+//let waterPulseInterval = null; // store interval so we can clear it
 let aqiMarkers = []; // track AQI circle markers
 let powerData = [];
 let powerMarkers = [];
 let powerHeatLayer = null;
-let powerPulseInterval = null;
+//let powerPulseInterval = null;
 
 
 
@@ -513,18 +513,18 @@ async function loadWaterHeatmap() {
     });
 
     // --- Pulsing animation ---
-    if (waterPulseInterval) clearInterval(waterPulseInterval);
-    let scaleUp = true;
-    waterPulseInterval = setInterval(() => {
-      waterMarkers.forEach(obj => {
-        const delta = 1 + obj.intensity * 3;
-        const maxRadius = obj.baseRadius + 4;
-        const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
-        obj.circle.setRadius(newRadius);
-        obj.circle.setStyle({ fillOpacity: 0.4 + 0.2 * obj.intensity });
-      });
-      scaleUp = !scaleUp;
-    }, 800);
+    // if (waterPulseInterval) clearInterval(waterPulseInterval);
+    // let scaleUp = true;
+    // waterPulseInterval = setInterval(() => {
+    //   waterMarkers.forEach(obj => {
+    //     const delta = 1 + obj.intensity * 3;
+    //     const maxRadius = obj.baseRadius + 4;
+    //     const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
+    //     obj.circle.setRadius(newRadius);
+    //     obj.circle.setStyle({ fillOpacity: 0.4 + 0.2 * obj.intensity });
+    //   });
+    //   scaleUp = !scaleUp;
+    // }, 800);
 
     document.getElementById('footer-timestamp').innerText =
       `Updated: ${new Date(data.timestamp).toLocaleString()}`;
@@ -578,19 +578,19 @@ async function loadPowerHeatmap() {
       powerMarkers.push({marker, baseRadius, intensity});
     });
 
-    // Pulsing animation
-    if(powerPulseInterval) clearInterval(powerPulseInterval);
-    let scaleUp = true;
-    powerPulseInterval = setInterval(() => {
-      powerMarkers.forEach(obj => {
-        const delta = 1 + obj.intensity * 3;
-        const maxRadius = obj.baseRadius + 4;
-        const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
-        obj.marker.setRadius(newRadius);
-        obj.marker.setStyle({ fillOpacity: 0.4 + 0.3 * obj.intensity });
-      });
-      scaleUp = !scaleUp;
-    }, 700);
+    // // Pulsing animation
+    // if(powerPulseInterval) clearInterval(powerPulseInterval);
+    // let scaleUp = true;
+    // powerPulseInterval = setInterval(() => {
+    //   powerMarkers.forEach(obj => {
+    //     const delta = 1 + obj.intensity * 3;
+    //     const maxRadius = obj.baseRadius + 4;
+    //     const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
+    //     obj.marker.setRadius(newRadius);
+    //     obj.marker.setStyle({ fillOpacity: 0.4 + 0.3 * obj.intensity });
+    //   });
+    //   scaleUp = !scaleUp;
+    // }, 700);
 
     document.getElementById('footer-timestamp').innerText =
       `Updated: ${new Date(data.timestamp).toLocaleString()}`;
@@ -631,39 +631,39 @@ async function loadCarbonHeatmap() {
       gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
     }).addTo(map);
 
-    // Add pulsating carbon markers
-    const pulseMarkers = [];
-    carbonData.forEach(p => {
-      const raw = parseFloat(p.carbon_footprint) || 0;
-      let normalized = (raw / maxCarbon) * 100;
-      normalized = Math.min(normalized, 1);
-      const colorIntensity = `rgba(255,0,0,${0.6 + 0.4*normalized})`;
+    // // Add pulsating carbon markers
+    // const pulseMarkers = [];
+    // carbonData.forEach(p => {
+    //   const raw = parseFloat(p.carbon_footprint) || 0;
+    //   let normalized = (raw / maxCarbon) * 100;
+    //   normalized = Math.min(normalized, 1);
+    //   const colorIntensity = `rgba(255,0,0,${0.6 + 0.4*normalized})`;
 
-      const marker = L.circleMarker([p.lat, p.lon], {
-        radius: 5,
-        fillColor: colorIntensity,
-        color: colorIntensity,
-        fillOpacity: 0.8,
-        weight: 0.5
-      }).addTo(map)
-        .bindTooltip(`CO₂: ${p.carbon_footprint.toLocaleString()} kg/MWh`, {direction:'top', className:'aqi-tooltip'});
+    //   const marker = L.circleMarker([p.lat, p.lon], {
+    //     radius: 5,
+    //     fillColor: colorIntensity,
+    //     color: colorIntensity,
+    //     fillOpacity: 0.8,
+    //     weight: 0.5
+    //   }).addTo(map)
+    //     .bindTooltip(`CO₂: ${p.carbon_footprint.toLocaleString()} kg/MWh`, {direction:'top', className:'aqi-tooltip'});
 
-      carbonMarkers.push(marker);
-      pulseMarkers.push({ marker, baseRadius: 5, intensity: normalized });
-    });
+    //   carbonMarkers.push(marker);
+    //   pulseMarkers.push({ marker, baseRadius: 5, intensity: normalized });
+    // });
 
-    // Pulsing animation
-        let scaleUp = true;
-        setInterval(() => {
-          pulseMarkers.forEach(obj => {
-            const delta = 2 + obj.intensity*2; // reduce growth
-            const maxRadius = obj.baseRadius + 3; // maximum allowed radius
-            const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
-            obj.marker.setRadius(newRadius);
-            obj.marker.setStyle({ fillOpacity: 0.5 + 0.3*obj.intensity }); // slightly less aggressive
-          });
-          scaleUp = !scaleUp;
-        }, 700);
+    // // Pulsing animation
+    //     let scaleUp = true;
+    //     setInterval(() => {
+    //       pulseMarkers.forEach(obj => {
+    //         const delta = 2 + obj.intensity*2; // reduce growth
+    //         const maxRadius = obj.baseRadius + 3; // maximum allowed radius
+    //         const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
+    //         obj.marker.setRadius(newRadius);
+    //         obj.marker.setStyle({ fillOpacity: 0.5 + 0.3*obj.intensity }); // slightly less aggressive
+    //       });
+    //       scaleUp = !scaleUp;
+    //     }, 700);
 
 
     document.getElementById('footer-timestamp').innerText =
@@ -729,11 +729,11 @@ function clearWaterLayer() {
     waterMarkers = [];
   }
 
-  // Clear animation
-  if (waterPulseInterval) {
-    clearInterval(waterPulseInterval);
-    waterPulseInterval = null;
-  }
+  // // Clear animation
+  // if (waterPulseInterval) {
+  //   clearInterval(waterPulseInterval);
+  //   waterPulseInterval = null;
+  // }
 }
 
 function clearPowerLayer() {
@@ -745,10 +745,10 @@ function clearPowerLayer() {
     powerMarkers.forEach(obj => map.removeLayer(obj.marker));
     powerMarkers = [];
   }
-  if(powerPulseInterval){
-    clearInterval(powerPulseInterval);
-    powerPulseInterval = null;
-  }
+  // if(powerPulseInterval){
+  //   clearInterval(powerPulseInterval);
+  //   powerPulseInterval = null;
+  // }
 }
 
 function addWaterProjectionTab() {
