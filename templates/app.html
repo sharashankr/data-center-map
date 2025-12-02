@@ -781,12 +781,6 @@ async function loadCarbonHeatmap() {
 loadDataCenters();   // always fine
 loadAQIHeatmap();    // initial view is AQI only
 
-// Set current layer explicitly to air to avoid accidental carbon loading
-currentLayer = "air";  
-showPanelsFor(currentLayer); // sets panels correctly
-
-// Optionally highlight the nav item for air layer
-document.querySelector('.nav-item[data-layer="air"]')?.classList.add('active');
 
 
 // --- Monitor layer radio ---
