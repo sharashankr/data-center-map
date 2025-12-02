@@ -679,29 +679,25 @@ async function loadCarbonHeatmap() {
     if (carbonData.length === 0) return;
 
     // Remove previous heatLayer & markers
-    if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+    if (heatLayer) { 
+      map.removeLayer(heatLayer); 
+      heatLayer = null; 
+    }
     carbonMarkers.forEach(m => map.removeLayer(m));
     carbonMarkers = [];
 
     const maxCarbon = Math.max(...carbonData.map(p => parseFloat(p.carbon_footprint) || 1));
 
-    // HeatLayer points (same as before)
-    const heatPoints = carbonData.map(p => {
-      const raw = parseFloat(p.carbon_footprint) || 0;
-      let normalized = (raw / maxCarbon) * 100;
-      normalized = Math.min(normalized, 1);
-      return [p.lat, p.lon, normalized];
-    });
-
-    heatLayer = L.heatLayer(heatPoints, {
-      radius: 25,
-      blur: 30,
-      maxZoom: 10,
-      gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
-    }).addTo(map);
+    // --- HeatLayer removed ---
+    // const heatPoints = carbonData.map(p => {
+    //   const raw = parseFloat(p.carbon_footprint) || 0;
+    //   let normalized = (raw / maxCarbon) * 100;
+    //   normalized = Math.min(normalized, 1);
+    //   return [p.lat, p.lon, normalized];
+    // });
+    // heatLayer = L.heatLayer(heatPoints, {...}).addTo(map);
 
     // Add carbon markers (static)
-    const pulseMarkers = [];
     carbonData.forEach(p => {
       const raw = parseFloat(p.carbon_footprint) || 0;
       let normalized = (raw / maxCarbon) * 100;
@@ -718,7 +714,6 @@ async function loadCarbonHeatmap() {
         .bindTooltip(`CO₂: ${p.carbon_footprint.toLocaleString()} kg/MWh`, {direction:'top', className:'aqi-tooltip'});
 
       carbonMarkers.push(marker);
-      pulseMarkers.push({ marker, baseRadius: 5, intensity: normalized });
     });
 
     // --- Pulsing animation removed ---
@@ -741,7 +736,9 @@ async function loadCarbonHeatmap() {
 
     setLegend('co2');
 
-  } catch(err) { console.error(err); }
+  } catch(err) { 
+    console.error(err); 
+  }
 }
 
 
