@@ -264,50 +264,47 @@ print("Data loading complete.")
 def get_monitors():
     pollutant = request.args.get("pollutant", "all").lower()
 
-    # Filter monitors based on pollutant
-    if pollutant == "ozone":
-        monitors = [m for m in MONITOR_DATA if "ozone" in m["pollutant"]]
-    elif pollutant == "pm":
+    # Normalize pollutant values
+    if pollutant in ["pm", "pm25", "pm2.5", "pm 2.5"]:
         monitors = [m for m in MONITOR_DATA if "pm" in m["pollutant"]]
+    elif pollutant == "ozone":
+        monitors = [m for m in MONITOR_DATA if "ozone" in m["pollutant"]]
     else:
         monitors = MONITOR_DATA
 
-    # Load data centers dynamically with extra fields
+    # Load data centers dynamically
     data_centers = []
     if os.path.exists(DC_CSV):
         with open(DC_CSV, newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 try:
-                    lat_str = row.get("Lat", "").strip()
-                    lon_str = row.get("Long", "").strip()
-                    if not lat_str or not lon_str:
-                        continue
-                    lat = float(lat_str)
-                    lon = float(lon_str)
-
-                    data_centers.append({
-                        "Name": row.get("Name", "N/A"),
-                        "City": row.get("City", ""),
-                        "State": row.get("State", ""),
-                        "Operator": row.get("Operator", ""),
-                        "PowerSource": row.get("Power source", ""),
-                        "CoolingSource": row.get("Cooling source", ""),
-                        "PropertySizeAcres": row.get("Property Size (acres)", ""),
-                        "ProjectCost": row.get("Project cost", ""),
-                        "Status": row.get("Status", ""),
-                        "lat": lat,
-                        "lon": lon,
-                        "SizeRank": row.get("SizeRank (numeric)", "")
-                    })
-                except Exception:
+                    lat = float(row.get("Lat", "").strip())
+                    lon = float(row.get("Long", "").strip())
+                except:
                     continue
+
+                data_centers.append({
+                    "Name": row.get("Name", "N/A"),
+                    "City": row.get("City", ""),
+                    "State": row.get("State", ""),
+                    "Operator": row.get("Operator", ""),
+                    "PowerSource": row.get("Power source", ""),
+                    "CoolingSource": row.get("Cooling source", ""),
+                    "PropertySizeAcres": row.get("Property Size (acres)", ""),
+                    "ProjectCost": row.get("Project cost", ""),
+                    "Status": row.get("Status", ""),
+                    "lat": lat,
+                    "lon": lon,
+                    "SizeRank": row.get("SizeRank (numeric)", "")
+                })
 
     return jsonify({
         "timestamp": datetime.now(pytz.utc).isoformat(),
         "monitors": monitors,
         "data_centers": data_centers
     })
+
 
 # --- API endpoint: /api/water ---
 @app.route('/api/water', methods=['GET'])
