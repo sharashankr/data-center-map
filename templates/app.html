@@ -295,12 +295,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 </div>
 
 <!-- Info Box -->
-<div id="map-info-box" style="display:none;">
-  <div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
-  <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
-  <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
-  <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>
-</div>
+<div id="map-info-box" style="display:none;"></div>
 
 <style>
   #map-info-box {
@@ -337,6 +332,29 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   const btn = document.getElementById('directions-btn');
   const box = document.getElementById('map-info-box');
 
+  // Define info content for each layer
+  const layerInfo = {
+    AirQuality: `
+      <div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
+      <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
+      <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
+      <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>
+    `,
+    Water: `
+      <div><strong>Map Overview:</strong> The map displays water usage across locations and data centers.</div>
+      <div><strong>Water Layer:</strong> Hover over the map to see water footprint for each location. Data is available for total water use, blue water, and grey water.</div>
+      <div><strong>Data Center Layer:</strong> Hover over a data center to view water usage details along with other metadata like city, state, size, and status.</div>
+      <div><strong>Interactions:</strong> Click a monitor or data center to explore more details and compare water usage across sites.</div>
+    `,
+    CO2: `
+      <div><strong>Map Overview:</strong> The map displays CO₂ emissions across locations and data centers.</div>
+      <div><strong>CO₂ Layer:</strong> Hover over the map to see emissions for each location. Emissions can be viewed per energy source or total carbon footprint.</div>
+      <div><strong>Data Center Layer:</strong> Hover over a data center to view carbon metrics, operator, city, state, project cost, and status.</div>
+      <div><strong>Interactions:</strong> Click a monitor or data center to explore CO₂ details and compare emissions between sites.</div>
+    `
+  };
+
+  // Toggle info box visibility
   btn.addEventListener('click', () => {
     if(box.style.display === 'none'){
       box.style.display = 'block';
@@ -346,6 +364,16 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
       btn.innerText = 'Directions on Navigating the Page';
     }
   });
+
+  // Function to update info content based on selected layer
+  function updateInfoBox(layer) {
+    box.innerHTML = layerInfo[layer] || '<div>No info available for this layer.</div>';
+  }
+
+  // Example usage:
+  // Call updateInfoBox('AirQuality') when AQI layer is selected
+  // Call updateInfoBox('Water') when Water layer is selected
+  // Call updateInfoBox('CO2') when CO2 layer is selected
 </script>
 
 
