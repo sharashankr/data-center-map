@@ -28,36 +28,6 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   font-size:0.9rem; display:flex; flex-direction:column; gap:4px;
 }
 
-#map-info-box {
-  position: absolute;
-  top: 80px;      /* adjust for header */
-  right: 15px;
-  width: 340px;
-  background: rgba(30, 41, 59, 0.95);
-  color: #f0f0f0;
-  padding: 18px 20px;
-  border-radius: 16px;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.6);
-  font-size: 0.92rem;
-  line-height: 1.5rem;
-  z-index: 520;
-  transition: all 0.3s ease;
-}
-
-#map-info-box strong {
-  color: #6EC1E4;
-}
-
-#map-info-box div {
-  margin-bottom: 10px;
-}
-
-#map-info-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 32px rgba(0,0,0,0.65);
-}
-
-
 /* Data Center Info Tab - Small */
 #dc-info-tab {
   position: absolute;
@@ -305,12 +275,79 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   </div>
 </div>
 
-<div id="map-info-box" class="info-box" style="display:none;">
+<!-- Directions Button -->
+<div id="directions-btn" 
+     style="
+       position: fixed;
+       bottom: 20px;
+       right: 20px;
+       background-color: #1e40af;
+       color: white;
+       padding: 8px 12px;
+       border-radius: 12px;
+       cursor: pointer;
+       z-index: 550;
+       font-size: 0.85rem;
+       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+       transition: all 0.2s ease;
+     ">
+  Directions on Navigating the Page
+</div>
+
+<!-- Info Box -->
+<div id="map-info-box" style="display:none;">
   <div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
   <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
   <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
   <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>
 </div>
+
+<style>
+  #map-info-box {
+    position: absolute;
+    top: 80px;      /* adjust for header */
+    right: 15px;
+    width: 340px;
+    background: rgba(30, 41, 59, 0.95);
+    color: #f0f0f0;
+    padding: 18px 20px;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+    font-size: 0.92rem;
+    line-height: 1.5rem;
+    z-index: 520;
+    transition: all 0.3s ease;
+  }
+
+  #map-info-box strong {
+    color: #6EC1E4;
+  }
+
+  #map-info-box div {
+    margin-bottom: 10px;
+  }
+
+  #map-info-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.65);
+  }
+</style>
+
+<script>
+  const btn = document.getElementById('directions-btn');
+  const box = document.getElementById('map-info-box');
+
+  btn.addEventListener('click', () => {
+    if(box.style.display === 'none'){
+      box.style.display = 'block';
+      btn.innerText = 'Hide Directions';
+    } else {
+      box.style.display = 'none';
+      btn.innerText = 'Directions on Navigating the Page';
+    }
+  });
+</script>
+
 
 
 
