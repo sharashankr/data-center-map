@@ -1146,6 +1146,16 @@ const panels = {
   monitor: document.getElementById('monitor-panel'),
   insights: document.getElementById('more-insights'),
 };
+  
+const filterIds = ['state-filter', 'fuel-filter', 'subbasin-filter'];
+
+function toggleFiltersForLayer(layer) {
+    const show = ['water','power','co2'].includes(layer.toLowerCase());
+    filterIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = show ? 'block' : 'none';
+    });
+}
 
 function showPanelsFor(layer) {
     // Toggle main panels
@@ -1178,6 +1188,9 @@ function showPanelsFor(layer) {
     if (layer === "co2") {
         addCarbonProjectionTab();
     }
+
+    // --- Toggle filters for this layer ---
+    toggleFiltersForLayer(layer);
 }
 
 
