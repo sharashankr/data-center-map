@@ -12,7 +12,13 @@
 
 <style>
 html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hidden; background:#111827; }
-#map { position:absolute; top:90px; bottom:0; right:0; left:0; }
+#map {
+  position: absolute;
+  top: 120px; /* was 100px, give extra space */
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
 
 /* Monitor Panel */
 #monitor-panel {
@@ -21,6 +27,36 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5); z-index:500;
   font-size:0.9rem; display:flex; flex-direction:column; gap:4px;
 }
+
+#map-info-box {
+  position: absolute;
+  top: 80px;      /* adjust for header */
+  right: 15px;
+  width: 340px;
+  background: rgba(30, 41, 59, 0.95);
+  color: #f0f0f0;
+  padding: 18px 20px;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+  font-size: 0.92rem;
+  line-height: 1.5rem;
+  z-index: 520;
+  transition: all 0.3s ease;
+}
+
+#map-info-box strong {
+  color: #6EC1E4;
+}
+
+#map-info-box div {
+  margin-bottom: 10px;
+}
+
+#map-info-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.65);
+}
+
 
 /* Data Center Info Tab - Small */
 #dc-info-tab {
@@ -169,9 +205,33 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 #footer-timestamp { position:absolute; bottom:10px; right:15px; background:rgba(30,41,59,0.85); padding:6px 12px;
   border-radius:10px; color:#f0f0f0; font-size:0.8rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:500; }
 
-#title-ribbon { height:40px; background: linear-gradient(to right,#0f2b42,#1a3c54); text-align:center; line-height:40px; font-weight:600; color:#e0e0e0;}
-#nav-ribbon { height:50px; background:#1a3c54; display:flex; justify-content:space-between; align-items:center; padding:0 15px; }
-.nav-item { cursor:pointer; padding:0 15px; line-height:50px; font-weight:500; transition: all 0.2s; color:#e0e0e0; }
+/* Title Ribbon */
+#title-ribbon {
+  height: 60px; /* taller */
+  line-height: 60px; /* vertically center text */
+  font-size: 1.8rem; /* bigger text */
+  font-weight: 700;
+  background: linear-gradient(to right,#0f2b42,#1a3c54);
+  text-align: center;
+  color: #e0e0e0;
+}
+
+/* Navigation Ribbon */
+#nav-ribbon {
+  height: 60px; /* taller */
+  line-height: 60px; /* vertically center items */
+  background: #1a3c54;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.nav-item {
+  font-size: 1.1rem; /* slightly bigger nav options */
+  padding: 0 18px;
+  line-height: 60px; /* match ribbon height */
+}
 .nav-item:hover { background:rgba(255,255,255,0.1); border-radius:6px; }
 .nav-item.active { border-bottom:3px solid #6EC1E4; }
 
@@ -244,6 +304,14 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
     <strong>Status:</strong> <span id="dc-status">N/A</span>
   </div>
 </div>
+
+<div id="map-info-box" class="info-box" style="display:none;">
+  <div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
+  <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
+  <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
+  <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>
+</div>
+
 
 
 <!-- Monitor Panel -->
@@ -696,20 +764,36 @@ const panels = {
 };
 
 function showPanelsFor(layer) {
+    // Toggle main panels
     panels.monitor.style.display = (layer === "air") ? "flex" : "none";
     panels.insights.style.display = (layer === "water" || layer === "co2") ? "flex" : "none";
 
-    // Remove old projection tabs
-    ['water-projection-tab','water-vs-carbon-tab','carbon-projection-tab'].forEach(id=>{
+    // Toggle the map info text box
+    const infoBox = document.getElementById('map-info-box');
+    if (infoBox) {
+        infoBox.style.display = (layer === "air") ? "block" : "none";
+    }
+
+    // Remove old projection tabs if they exist
+    const projectionTabIds = [
+        'water-projection-tab',
+        'water-vs-carbon-tab',
+        'carbon-projection-tab'
+    ];
+
+    projectionTabIds.forEach(id => {
         const el = document.getElementById(id);
-        if(el) el.remove();
+        if (el) el.remove();
     });
 
-    if(layer === "water") {
+    // Add relevant projection tabs
+    if (layer === "water") {
         addWaterProjectionTab();
         addWaterVsCarbonTab(); // NEW
     }
-    if(layer === "co2") addCarbonProjectionTab();
+    if (layer === "co2") {
+        addCarbonProjectionTab();
+    }
 }
 
 
