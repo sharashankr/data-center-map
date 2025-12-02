@@ -592,100 +592,87 @@ async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", sel
     let waterData = data.points || [];
     if (!waterData.length) return;
 
-    // --- Apply State Filter for dropdown population ---
-    let filteredForDropdowns = waterData;
-    if (selectedState !== "all") {
-      filteredForDropdowns = filteredForDropdowns.filter(p => p.state === selectedState);
-    }
+    // --- Apply filters for plotting only ---
+    let filteredForPlot = waterData.slice();
+    if (selectedState !== "all") filteredForPlot = filteredForPlot.filter(p => p.state === selectedState);
+    if (selectedFuel !== "all") filteredForPlot = filteredForPlot.filter(p => p.primary_fuel === selectedFuel);
+    if (selectedSubbasin !== "all") filteredForPlot = filteredForPlot.filter(p => p.subbasin === selectedSubbasin);
 
-    // ======================================================
-    //                STATE DROPDOWN
-    // ======================================================
+    // --- Compute allowed values for dropdowns based on other selections ---
+    const filteredStates = [...new Set(
+      waterData
+        .filter(p => (selectedFuel === "all" || p.primary_fuel === selectedFuel) &&
+                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+        .map(p => p.state).filter(Boolean)
+    )].sort();
+
+    const filteredFuels = [...new Set(
+      waterData
+        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+        .map(p => p.primary_fuel).filter(Boolean)
+    )].sort();
+
+    const filteredSubbasins = [...new Set(
+      waterData
+        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                     (selectedFuel === "all" || p.primary_fuel === selectedFuel))
+        .map(p => p.subbasin).filter(Boolean)
+    )].sort();
+
+    // --- Populate STATE DROPDOWN ---
     const stateSelect = document.getElementById('state-filter');
     if (stateSelect) {
-      const allStates = [...new Set(waterData.map(p => p.state).filter(Boolean))].sort();
       stateSelect.innerHTML = '';
-
       const allOption = document.createElement('option');
       allOption.value = 'all';
       allOption.text = 'All States';
       allOption.selected = selectedState === 'all';
       stateSelect.appendChild(allOption);
 
-      allStates.forEach(state => {
+      filteredStates.forEach(s => {
         const option = document.createElement('option');
-        option.value = state;
-        option.text = state;
-        if (state === selectedState) option.selected = true;
+        option.value = s;
+        option.text = s;
+        if (s === selectedState) option.selected = true;
         stateSelect.appendChild(option);
-      });
-
-      // Expand on click/focus
-      stateSelect.addEventListener('focus', () => {
-        stateSelect.size = Math.min(5, stateSelect.options.length);
-      });
-
-      // Collapse when done
-      stateSelect.addEventListener('blur', () => {
-        stateSelect.size = 1;
       });
 
       stateSelect.size = 1;
     }
 
-    // ======================================================
-    //                FUEL DROPDOWN
-    // ======================================================
+    // --- Populate FUEL DROPDOWN ---
     const fuelSelect = document.getElementById('fuel-filter');
     if (fuelSelect) {
-      const allFuels = [...new Set(filteredForDropdowns.map(p => p.primary_fuel).filter(Boolean))].sort();
       fuelSelect.innerHTML = '';
-
       const allOption = document.createElement('option');
       allOption.value = 'all';
       allOption.text = 'All Fuels';
       allOption.selected = selectedFuel === 'all';
       fuelSelect.appendChild(allOption);
 
-      allFuels.forEach(fuel => {
+      filteredFuels.forEach(f => {
         const option = document.createElement('option');
-        option.value = fuel;
-        option.text = fuel;
-        if (fuel === selectedFuel) option.selected = true;
+        option.value = f;
+        option.text = f;
+        if (f === selectedFuel) option.selected = true;
         fuelSelect.appendChild(option);
-      });
-
-      fuelSelect.addEventListener('focus', () => {
-        fuelSelect.size = Math.min(5, fuelSelect.options.length);
-      });
-
-      fuelSelect.addEventListener('blur', () => {
-        fuelSelect.size = 1;
       });
 
       fuelSelect.size = 1;
     }
 
-    // ======================================================
-    //             SUBBASIN DROPDOWN
-    // ======================================================
-    let filteredForSubbasin = filteredForDropdowns;
-    if (selectedFuel !== "all") {
-      filteredForSubbasin = filteredForSubbasin.filter(p => p.primary_fuelƒ === selectedFuel);
-    }
-
+    // --- Populate SUBBASIN DROPDOWN ---
     const subbasinSelect = document.getElementById('subbasin-filter');
     if (subbasinSelect) {
-      const allSubbasins = [...new Set(filteredForSubbasin.map(p => p.subbasin).filter(Boolean))].sort();
       subbasinSelect.innerHTML = '';
-
       const allOption = document.createElement('option');
       allOption.value = 'all';
       allOption.text = 'All Subbasins';
       allOption.selected = selectedSubbasin === 'all';
       subbasinSelect.appendChild(allOption);
 
-      allSubbasins.forEach(sb => {
+      filteredSubbasins.forEach(sb => {
         const option = document.createElement('option');
         option.value = sb;
         option.text = sb;
@@ -693,30 +680,15 @@ async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", sel
         subbasinSelect.appendChild(option);
       });
 
-      subbasinSelect.addEventListener('focus', () => {
-        subbasinSelect.size = Math.min(5, subbasinSelect.options.length);
-      });
-
-      subbasinSelect.addEventListener('blur', () => {
-        subbasinSelect.size = 1;
-      });
-
       subbasinSelect.size = 1;
     }
 
-    // ======================================================
-    //       APPLY FINAL FILTERS FOR PLOTTING
-    // ======================================================
-    if (selectedState !== "all") waterData = waterData.filter(p => p.state === selectedState);
-    if (selectedFuel !== "all") waterData = waterData.filter(p => p.primary_fuel === selectedFuel);
-    if (selectedSubbasin !== "all") waterData = waterData.filter(p => p.subbasin === selectedSubbasin);
-
     // --- Clear old markers and draw new ones ---
     clearWaterLayer();
-    const maxFootprint = Math.max(...waterData.map(p => parseFloat(p.water_footprint) || 0));
+    const maxFootprint = Math.max(...filteredForPlot.map(p => parseFloat(p.water_footprint) || 0));
     waterMarkers = [];
 
-    waterData.forEach(p => {
+    filteredForPlot.forEach(p => {
       const footprint = parseFloat(p.water_footprint) || 0;
       const intensity = Math.min(footprint / maxFootprint, 1.0);
       const baseRadius = 4 + intensity * 12;
@@ -752,6 +724,7 @@ async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", sel
     console.error('Error loading water heatmap:', err);
   }
 }
+
 
 
 
