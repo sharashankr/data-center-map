@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ƒ<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -536,15 +536,13 @@ async function loadWaterHeatmap() {
 
     const maxFootprint = Math.max(...waterData.map(p => parseFloat(p.water_footprint) || 0));
 
-
-
     const heatPoints = waterData.map(p => [p.lat, p.lon, (parseFloat(p.water_footprint)||0) / maxFootprint * 0.02]);
     // scale down intensity drastically (2% of full)
 
     waterHeatLayer = L.heatLayer(heatPoints, {
-      radius: 15,      // smaller radius
-      blur: 15,        // softer blur
-      minOpacity: 0.2, // lower opacity for overall soft look
+      radius: 15,
+      blur: 15,
+      minOpacity: 0.2,
       gradient: {
         0.0: '#0000ff',
         0.25: '#00ffff',
@@ -554,9 +552,7 @@ async function loadWaterHeatmap() {
       }
     }).addTo(map);
 
-
-
-    // --- Pulsating Circles ---
+    // --- Pulsating Circles (static now) ---
     waterMarkers = []; // reset
     waterData.forEach(p => {
       const intensity = Math.min((parseFloat(p.water_footprint) || 0) / maxFootprint, 1.0);
@@ -580,7 +576,8 @@ async function loadWaterHeatmap() {
       waterMarkers.push({circle, baseRadius, intensity});
     });
 
-    // --- Pulsing animation ---
+    // --- Pulsing animation removed ---
+    /*
     if (waterPulseInterval) clearInterval(waterPulseInterval);
     let scaleUp = true;
     waterPulseInterval = setInterval(() => {
@@ -593,6 +590,7 @@ async function loadWaterHeatmap() {
       });
       scaleUp = !scaleUp;
     }, 800);
+    */
 
     document.getElementById('footer-timestamp').innerText =
       `Updated: ${new Date(data.timestamp).toLocaleString()}`;
