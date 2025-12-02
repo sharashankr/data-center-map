@@ -443,7 +443,7 @@ function setLegend(layer){
 // --- Load Data Centers ---
 async function loadDataCenters(){
   try {
-    const res = await fetch('https://data-center-map-51tz.onrender.com/api/monitors');
+    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/monitors');
     const data = await res.json();
     if(!data.data_centers || data.data_centers.length === 0) return;
 
@@ -495,7 +495,7 @@ async function loadDataCenters(){
 // --- Load AQI Heatmap ---
 async function loadAQIHeatmap(){
   try {
-    const res = await fetch(`https://data-center-map-51tz.onrender.com/api/monitors?pollutant=${currentPollutant}`);
+    const res = await fetch(`https://data-center-map-nu1d.onrender.com/api/monitors?pollutant=${currentPollutant}`);
     const data = await res.json();
     monitorData = data.monitors||[];
 
@@ -526,7 +526,7 @@ async function loadAQIHeatmap(){
 
 async function loadWaterHeatmap() {
   try {
-    const res = await fetch('https://data-center-map-51tz.onrender.com/api/water');
+    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water');
     const data = await res.json();
     waterData = data.points || [];
     if (waterData.length === 0) return;
@@ -605,7 +605,7 @@ async function loadWaterHeatmap() {
 
 async function loadPowerHeatmap() {
   try {
-    const res = await fetch('https://data-center-map-51tz.onrender.com/api/power');
+    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/power');
     const data = await res.json();
     const powerData = data.points || [];
     if (powerData.length === 0) return;
@@ -672,7 +672,7 @@ async function loadPowerHeatmap() {
 
 async function loadCarbonHeatmap() {
   try {
-    const res = await fetch('https://data-center-map-51tz.onrender.com/api/carbon');
+    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/carbon');
     const data = await res.json();
     const carbonData = data.points || [];
     if (carbonData.length === 0) return;
@@ -1017,8 +1017,8 @@ async function loadFuelTypeGraph(layerType = "water") {
     try {
         // Decide which API to call based on layer
         const apiUrl = layerType === "co2"
-            ? 'https://data-center-map-51tz.onrender.com/api/carbon_fuel'
-            : 'https://data-center-map-51tz.onrender.com/api/water_fuel';
+            ? 'https://data-center-map-nu1d.onrender.com/api/carbon_fuel'
+            : 'https://data-center-map-nu1d.onrender.com/api/water_fuel';
 
         const res = await fetch(apiUrl);
         const data = await res.json();
@@ -1089,7 +1089,7 @@ async function loadFuelTypeGraph(layerType = "water") {
 
 async function loadWaterProjectionChart() {
     try {
-        const res = await fetch('https://data-center-map-51tz.onrender.com/api/water_scenario');
+        const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water_scenario');
         const data = await res.json();
         const points = data.points;
         console.log("Water Scenario API returned:", data);
@@ -1168,7 +1168,7 @@ async function loadWaterProjectionChart() {
 
 async function loadCarbonProjectionChart() {
     try {
-        const res = await fetch('https://data-center-map-51tz.onrender.com/api/carbon_scenario');
+        const res = await fetch('https://data-center-map-nu1d.onrender.com/api/carbon_scenario');
         const apiResponse = await res.json(); // 1. Renamed 'data' to 'apiResponse' for clarity
         console.log("Carbon Scenario API returned:", apiResponse); // Check this log!
         const points = apiResponse.data;
@@ -1279,7 +1279,7 @@ async function loadCarbonProjectionChart() {
 
 async function loadWaterBubbleChart() {
     try {
-        const res = await fetch('https://data-center-map-51tz.onrender.com/api/water_carbon_data');
+        const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water_carbon_data');
         const data = await res.json();
 
         if (!data || data.length === 0) {
