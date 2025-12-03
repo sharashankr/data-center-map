@@ -360,26 +360,30 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
         function updateInfoBox(layer) {
             box.innerHTML = layerInfo[layer] || '<div>No info available for this layer.</div>';
-            // Always inject the X button when updating the box
-            if (!document.getElementById('close-info-box')) {
-                const closeBtnEl = document.createElement('button');
-                closeBtnEl.id = 'close-info-box';
-                closeBtnEl.innerText = '✖';
-                closeBtnEl.style.position = 'absolute';
-                closeBtnEl.style.top = '12px';
-                closeBtnEl.style.right = '16px';
-                closeBtnEl.style.background = 'transparent';
-                closeBtnEl.style.border = 'none';
-                closeBtnEl.style.color = '#fff';
-                closeBtnEl.style.fontSize = '1.3rem';
-                closeBtnEl.style.cursor = 'pointer';
-                closeBtnEl.style.zIndex = '10';
-                closeBtnEl.addEventListener('click', () => {
-                    box.style.display = 'none';
-                    btn.innerText = 'Directions on Navigating the Page';
-                });
-                box.appendChild(closeBtnEl);
-            }
+            ensureCloseButton();
+                // Ensures the X button is present and not duplicated
+                function ensureCloseButton() {
+                    let closeBtnEl = document.getElementById('close-info-box');
+                    if (!closeBtnEl) {
+                        closeBtnEl = document.createElement('button');
+                        closeBtnEl.id = 'close-info-box';
+                        closeBtnEl.innerText = '✖';
+                        closeBtnEl.style.position = 'absolute';
+                        closeBtnEl.style.top = '12px';
+                        closeBtnEl.style.right = '16px';
+                        closeBtnEl.style.background = 'transparent';
+                        closeBtnEl.style.border = 'none';
+                        closeBtnEl.style.color = '#fff';
+                        closeBtnEl.style.fontSize = '1.3rem';
+                        closeBtnEl.style.cursor = 'pointer';
+                        closeBtnEl.style.zIndex = '10';
+                        closeBtnEl.addEventListener('click', () => {
+                            box.style.display = 'none';
+                            btn.innerText = 'Directions on Navigating the Page';
+                        });
+                        box.appendChild(closeBtnEl);
+                    }
+                }
         }
 
         // Default to AirQuality initially
@@ -387,26 +391,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
         btn.addEventListener('click', () => {
             if(box.style.display === 'none'){
-                // Ensure the X button is present every time the box is shown
-                if (!document.getElementById('close-info-box')) {
-                    const closeBtnEl = document.createElement('button');
-                    closeBtnEl.id = 'close-info-box';
-                    closeBtnEl.innerText = '✖';
-                    closeBtnEl.style.position = 'absolute';
-                    closeBtnEl.style.top = '12px';
-                    closeBtnEl.style.right = '16px';
-                    closeBtnEl.style.background = 'transparent';
-                    closeBtnEl.style.border = 'none';
-                    closeBtnEl.style.color = '#fff';
-                    closeBtnEl.style.fontSize = '1.3rem';
-                    closeBtnEl.style.cursor = 'pointer';
-                    closeBtnEl.style.zIndex = '10';
-                    closeBtnEl.addEventListener('click', () => {
-                        box.style.display = 'none';
-                        btn.innerText = 'Directions on Navigating the Page';
-                    });
-                    box.appendChild(closeBtnEl);
-                }
+                ensureCloseButton();
                 box.style.display = 'block';
                 btn.innerText = 'Hide Directions';
             } else {
@@ -1315,9 +1300,10 @@ function setLegend(layer){
                             scales: {
                                 x: {
                                     ticks: { color: '#fff' },
-                                    title: { display: true, text: 'Number of Data Centers', color: '#fff', font: { size: 14 } }
+                                    title: { display: true, text: 'Number of Data Centers', color: '#fff', font: { size: 14 } },
+                                    grid: { color: 'rgba(255,255,255,0.18)', lineWidth: 1 }
                                 },
-                                y: { ticks: { color: '#fff' } }
+                                y: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.18)', lineWidth: 1 } }
                             }
                         }
                     });
@@ -1381,10 +1367,11 @@ function setLegend(layer){
                                 x: {
                                     beginAtZero: true,
                                     ticks: { color: '#fff' },
-                                    title: { display: true, text: 'Number of Data Centers', color: '#fff', font: { size: 14 } }
+                                    title: { display: true, text: 'Number of Data Centers', color: '#fff', font: { size: 14 } },
+                                    grid: { color: 'rgba(255,255,255,0.18)', lineWidth: 1 }
                                 },
                                 y: {
-                                    ticks: { color: '#fff' }
+                                    ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.18)', lineWidth: 1 }
                                 }
                             }
                         }
@@ -1449,12 +1436,10 @@ function setLegend(layer){
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
-
-                                // 🌟 FIX 🌟: Add Interaction and Tooltip Configuration
                                 interaction: {
-                                    mode: 'nearest', // Trigger tooltip when hovering nearest data point
-                                    intersect: false, // Allows the tooltip to trigger even if not directly over the point
-                                    axis: 'x' // Restrict interaction along the X-axis for smoother hover
+                                    mode: 'nearest',
+                                    intersect: false,
+                                    axis: 'x'
                                 },
                                 plugins: {
                                     legend: { display: false },
@@ -1462,11 +1447,9 @@ function setLegend(layer){
                                     tooltip: {
                                         callbacks: {
                                             title: function(context) {
-                                                // Display the X-value (Size) as the title
                                                 return `Size: ${context[0].parsed.x.toFixed(2)} Million sq ft`;
                                             },
                                             label: function(context) {
-                                                // Display the Y-value (Density) as the label
                                                 return `Density: ${context.parsed.y.toFixed(3)}`;
                                             }
                                         }
@@ -1479,15 +1462,16 @@ function setLegend(layer){
                                         title: { display: true, text: 'Size (Million sq ft)', color: '#fff' },
                                         min: minSize,
                                         max: maxSize,
-                                        ticks: { color: '#fff' }
+                                        ticks: { color: '#fff' },
+                                        grid: { color: 'rgba(255,255,255,0.18)', lineWidth: 1 }
                                     },
                                     'density-axis': {
                                         type: 'linear',
-                                        position: 'left', // Switched to 'left' for better primary focus
+                                        position: 'left',
                                         beginAtZero: true,
                                         max: Math.max(...curvePoints.map(p => p.y)) * 1.2 || 1.0,
                                         title: { display: true, text: 'Normalized Density', color: '#6EC1E4' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                        grid: { color: 'rgba(255,255,255,0.18)', lineWidth: 1 },
                                         ticks: { color: '#6EC1E4' }
                                     }
                                 }
