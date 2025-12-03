@@ -303,7 +303,9 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
         Directions on Navigating the Page
     </div>
 
-    <div id="map-info-box"></div>
+    <div id="map-info-box">
+        <button id="close-info-box" style="position:absolute; top:12px; right:16px; background:transparent; border:none; color:#fff; font-size:1.3rem; cursor:pointer; z-index:10;">✖</button>
+    </div>
 
     <style>
         #map-info-box {
@@ -341,15 +343,16 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
     <script>
         const btn = document.getElementById('directions-btn');
         const box = document.getElementById('map-info-box');
+        const closeBtn = document.getElementById('close-info-box');
 
         const layerInfo = {
             AirQuality: `<div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
                         <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
-                        <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
+                        <div><strong>Data Center Layer:</strong> Click on a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
                         <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>`,
             Water: `<div><strong>Map Overview:</strong> The map displays water usage across locations and data centers.</div>
                      <div><strong>Water Layer:</strong> Hover over the map to see water footprint for each location. Data is available for total water use, blue water, and grey water.</div>
-                     <div><strong>Data Center Layer:</strong> Hover over a data center to view water usage details along with other metadata like city, state, size, and status.</div>
+                     <div><strong>Data Center Layer:</strong> Click on a data center to view water usage details along with other metadata like city, state, size, and status.</div>
                      <div><strong>Interactions:</strong> Click a monitor or data center to explore more details and compare water usage across sites.</div>`,
             CO2: `<div><strong>Map Overview:</strong> The map displays CO₂ emissions across locations and data centers.</div>
                    <div><strong>CO₂ Layer:</strong> Hover over the map to see emissions for each location. Emissions can be viewed per energy source or total carbon footprint.</div>
@@ -366,6 +369,26 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
         btn.addEventListener('click', () => {
             if(box.style.display === 'none'){
+                // Ensure the X button is present every time the box is shown
+                if (!document.getElementById('close-info-box')) {
+                    const closeBtnEl = document.createElement('button');
+                    closeBtnEl.id = 'close-info-box';
+                    closeBtnEl.innerText = '✖';
+                    closeBtnEl.style.position = 'absolute';
+                    closeBtnEl.style.top = '12px';
+                    closeBtnEl.style.right = '16px';
+                    closeBtnEl.style.background = 'transparent';
+                    closeBtnEl.style.border = 'none';
+                    closeBtnEl.style.color = '#fff';
+                    closeBtnEl.style.fontSize = '1.3rem';
+                    closeBtnEl.style.cursor = 'pointer';
+                    closeBtnEl.style.zIndex = '10';
+                    closeBtnEl.addEventListener('click', () => {
+                        box.style.display = 'none';
+                        btn.innerText = 'Directions on Navigating the Page';
+                    });
+                    box.appendChild(closeBtnEl);
+                }
                 box.style.display = 'block';
                 btn.innerText = 'Hide Directions';
             } else {
@@ -390,7 +413,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
     </div>
 
     <div id="more-insights">
-        <strong>More Insights</strong>
+        <strong>More Insights (click to view)</strong>
 
   <!-- Existing Fuel Type -->
   <div class="insight-item" data-type="fuel">
@@ -469,7 +492,8 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
     <div id="summary-overlay">
         <div id="summary-grid">
             <div class="grid-box" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <div id="total-dc-count" style="position: absolute; top: 10px; right: 16px; color:#fff; font-size:1.05rem; font-weight: 500; z-index:2;"></div>
+                <div id="total-dc-count" style="position: absolute; top: 10px; right: 16px; color:#fff; font-size:1.05rem; font-weight: 500; z-index:2; background:rgba(30,41,59,0.0); border:2px solid #fff; border-radius:8px; padding:6px 14px; box-shadow:0 2px 8px rgba(0,0,0,0.18);">
+                </div>
                 <canvas id="plot-status"></canvas>
             </div>
             <div class="grid-box"><canvas id="plot-states"></canvas></div>
@@ -489,7 +513,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
     <select id="state-filter" style="
         position: absolute;
-        top: 35%;
+        top: 130px;
         right: 20px;
         z-index: 550;
         background: rgba(30,41,59,0.95);
@@ -509,7 +533,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
     <select id="fuel-filter" style="
         position: absolute;
-        top: 45%;
+        top: 170px;
         right: 20px;
         z-index: 550;
         background: rgba(30,41,59,0.95);
@@ -529,7 +553,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
     <select id="subbasin-filter" style="
         position: absolute;
-        top: 55%;
+        top: 210px;
         right: 20px;
         z-index: 550;
         background: rgba(30,41,59,0.95);
@@ -1239,7 +1263,7 @@ function setLegend(layer){
                             aspectRatio: 1,
                             plugins: {
                                 legend: { position: 'bottom', labels: { color: '#fff' } },
-                                title: { display:true, text:'Project Status', color: '#fff' }
+                                title: { display:true, text:'Status of Data Centers in the US', color: '#fff' }
                             }
                         }
                     });
@@ -1247,7 +1271,7 @@ function setLegend(layer){
                     const totalCount = status_counts.reduce((sum, d) => sum + (typeof d.count === 'number' ? d.count : 0), 0);
                     document.getElementById('total-dc-count').innerText = `Total Data Centers: ${totalCount}`;
                 } else {
-                    document.getElementById('plot-status').parentElement.innerHTML = '<div class="grid-box" style="color:#ccc; text-align:center;">No Status data available.</div>';
+                    document.getElementById('plot-status').parentElement.innerHTML = '<div class="grid-box" style="color:#fff; text-align:center;">No Status data available.</div>';
                 }
 
                 // --- Plot 2: Top States Horizontal Bar (MAINTAIN ASPECT RATIO SET) ---
@@ -1270,7 +1294,13 @@ function setLegend(layer){
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: { legend: { display: false }, title: { display:true, text:'States with Most Data Centers', color: '#fff' } },
-                            scales: { x: { ticks: { color: '#fff' } }, y: { ticks: { color: '#fff' } } }
+                            scales: {
+                                x: {
+                                    ticks: { color: '#fff' },
+                                    title: { display: true, text: 'Number of Data Centers', color: '#fff', font: { size: 14 } }
+                                },
+                                y: { ticks: { color: '#fff' } }
+                            }
                         }
                     });
                 } else {
@@ -1327,12 +1357,13 @@ function setLegend(layer){
                             },
                             plugins: {
                                 legend: { display:false },
-                                title: { display:true, text:'Top 10 Data Center Operators', color: '#fff' }
+                                title: { display:true, text:'Top 10 Data Center Operators in the US', color: '#fff' }
                             },
                             scales: {
                                 x: {
                                     beginAtZero: true,
-                                    ticks: { color: '#fff' }
+                                    ticks: { color: '#fff' },
+                                    title: { display: true, text: 'Number of Data Centers', color: '#fff', font: { size: 14 } }
                                 },
                                 y: {
                                     ticks: { color: '#fff' }
@@ -1409,7 +1440,7 @@ function setLegend(layer){
                                 },
                                 plugins: {
                                     legend: { display: false },
-                                    title: { display: true, text: 'Facility Size Density Distribution', color: '#fff' },
+                                    title: { display: true, text: 'Data Center Size Distribution', color: '#fff' },
                                     tooltip: {
                                         callbacks: {
                                             title: function(context) {
