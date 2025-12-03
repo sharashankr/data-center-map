@@ -1629,7 +1629,11 @@ function clearHeatLayer() {
 
 let carbonLoaded = false; // existing at top of script
 let powerLoaded = false;  // new flag for power layer
-
+  
+function removeSummaryOverlay() {
+  const overlay = document.getElementById("summary-overlay");
+  if (overlay) overlay.remove();
+}
 // ---- Layer Switcher ----
 function loadLayer(layer) {
   // Clear map layers (dc markers, heatmaps, etc.)
