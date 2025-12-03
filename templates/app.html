@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
+.dc-icon i { color: white !important; }
 html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hidden; background:#111827; }
 #map {
   position: absolute;
@@ -236,41 +237,41 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   <button id="close-dc-tab">✖</button>
 
   <div>
-    <span class="dc-icon-small"><i class="fas fa-database" style="color:cyan;"></i></span>
+    <span class="dc-icon-small"><i class="fas fa-database" style="color:whitesmoke;"></i></span>
     <strong id="dc-name">DC Name</strong>
   </div>
   <div>
-    <span class="dc-icon-small"><i class="fas fa-layer-group" style="color:#6EC1E4;"></i></span>
+    <span class="dc-icon-small"><i class="fas fa-layer-group" style="color:whitesmoke;"></i></span>
     <strong>Size In Acres:</strong> <span id="dc-size">N/A</span>
   </div>
   <div>
-    <span class="dc-icon-small"><i class="fas fa-bolt" style="color:#FACC15;"></i></span>
+    <span class="dc-icon-small"><i class="fas fa-bolt" style="color:#e1c03e;"></i></span>
     <strong>Power Source:</strong> <span id="dc-power">N/A</span>
   </div>
   <div>
-    <span class="dc-icon-small"><i class="fas fa-snowflake" style="color:#3B82F6;"></i></span>
+    <span class="dc-icon-small"><i class="fas fa-snowflake" style="color:#6287c1;"></i></span>
     <strong>Cooling Source:</strong> <span id="dc-cooling">N/A</span>
   </div>
 
   <!-- Extra fields in same style -->
   <div>
-    <span class="dc-icon-small"><i class="fas fa-building" style="color:#FFD700;"></i></span>
+    <span class="dc-icon-small"><i class="fas fa-building" style="color:#c59632;"></i></span>
     <strong>Operator:</strong> <span id="dc-operator">N/A</span>
   </div>
   <div>
-    <span class="dc-icon-small"><i class="fas fa-city" style="color:#4ADE80;"></i></span>
+    <span class="dc-icon-small"><i class="fas fa-city" style="color:#8d4794;"></i></span>
     <strong>City:</strong> <span id="dc-city">N/A</span>
   </div>
   <div>
-    <span class="dc-icon-small"><i class="fas fa-map-marker-alt" style="color:#3B82F6;"></i></span>
+    <span class="dc-icon-small"><i class="fas fa-map-marker-alt" style="color:#4777c4;"></i></span>
     <strong>State:</strong> <span id="dc-state">N/A</span>
   </div>
   <div>
-    <span class="dc-icon-small"><i class="fas fa-dollar-sign" style="color:#FACC15;"></i></span>
+    <span class="dc-icon-small"><i class="fas fa-dollar-sign" style="color:#329235;"></i></span>
     <strong>Project Cost:</strong> <span id="dc-cost">N/A</span>
   </div>
   <div>
-    <span class="dc-icon-small"><i class="fas fa-info-circle" style="color:#FF6B6B;"></i></span>
+    <span class="dc-icon-small"><i class="fas fa-info-circle" style="color:#e76464;"></i></span>
     <strong>Status:</strong> <span id="dc-status">N/A</span>
   </div>
 </div>
@@ -387,12 +388,12 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
   <!-- Existing Fuel Type -->
   <div class="insight-item" data-type="fuel">
-    <i class="fas fa-gas-pump" style="color:yellow;"></i> Fuel Type
+    <i class="fas fa-gas-pump" style="color:rgb(227, 209, 70);"></i> Fuel Type
   </div>
 
   <!-- Dynamically added Water Projections (via JS) -->
   <div id="water-projection-tab" class="insight-item">
-    <i class="fas fa-water" style="color:#3B82F6;"></i> Water Projections
+    <i class="fas fa-water" style="color:#426bad;"></i> Water Projections
   </div>
 </div>
 
@@ -550,16 +551,16 @@ function setLegend(layer){
       <div><span style="background:orange"></span>Unhealthy for Sensitive</div>
       <div><span style="background:red"></span>Unhealthy</div>
       <div><span style="background:purple"></span>Very Unhealthy</div>
-      <div><span style="background:cyan"></span>Data Center</div>
+      <div><span style="background:whitesmoke"></span>Data Center</div>
     `;
   } else if(layer==='water'){
     legend.innerHTML = `
-      <div><span style="background:blue"></span>Low footprint</div>
-      <div><span style="background:cyan"></span>Moderate</div>
-      <div><span style="background:lime"></span>High</div>
-      <div><span style="background:yellow"></span>Very High</div>
-      <div><span style="background:red"></span>Extreme</div>
-      <div><span style="background:cyan"></span>Data Center</div>
+      <div><span style="background:blue;opacity:0.5;"></span>Low footprint</div>
+      <div><span style="background:cyan;opacity:0.5;"></span>Moderate</div>
+      <div><span style="background:lime;opacity:0.5;"></span>High</div>
+      <div><span style="background:yellow;opacity:0.5;"></span>Very High</div>
+      <div><span style="background:red;opacity:0.5;"></span>Extreme</div>
+      <div><span style="background:white;opacity:0.5;"></span>Data Center</div>
     `;
   }
   else if(layer === 'co2'){
@@ -569,7 +570,7 @@ function setLegend(layer){
     <div><span style="background:#ffff00"></span>High</div>
     <div><span style="background:#ff8800"></span>Very High</div>
     <div><span style="background:#ff0000"></span>Extreme</div>
-    <div><span style="background:cyan"></span>Data Center</div>
+    <div><span style="background:whitesmoke"></span>Data Center</div>
   `;
 }
 
@@ -592,7 +593,7 @@ async function loadDataCenters() {
       const marker = L.marker([Number(dc.lat), Number(dc.lon)], {
         icon: L.divIcon({
           className: 'dc-icon',
-          html: `<i class="fas fa-database" style="color:cyan;font-size:12px;"></i>`
+          html: `<i class="fas fa-database" style="color:whitesmoke;font-size:12px;"></i>`
         })
       }).addTo(map);
 
@@ -923,10 +924,11 @@ async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", sel
       const intensity = Math.min((parseFloat(p.total_mwh)||0)/maxPower, 1);
       const baseRadius = 4 + intensity * 10;
 
+      
       const marker = L.circleMarker([p.lat, p.lon], {
         radius: baseRadius,
-        color:'#FACC15',
-        fillColor:'#FACC15',
+        color:'#F59E42',
+        fillColor:'#F59E42',
         fillOpacity:0.6,
         weight:1
       }).addTo(map);
@@ -1049,12 +1051,7 @@ async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", se
     }
 
     // --- Clear previous heat & markers ---
-    if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
-    carbonMarkers.forEach(m => map.removeLayer(m));
-    carbonMarkers = [];
-
-    if (!filteredForPlot.length) return;
-
+    clearPowerLayer();
     const maxCarbon = Math.max(...filteredForPlot.map(p => parseFloat(p.carbon_footprint) || 1));
 
     const heatPoints = filteredForPlot.map(p => {
@@ -1076,8 +1073,8 @@ async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", se
       const colorIntensity = `rgba(255,0,0,${0.6 + 0.4*normalized})`;
       const marker = L.circleMarker([p.lat, p.lon], {
         radius: 5,
-        fillColor: colorIntensity,
-        color: colorIntensity,
+        fillColor: '#F87171',
+        color: '#F87171',
         fillOpacity: 0.8,
         weight: 0.5
       }).addTo(map)
