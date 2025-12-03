@@ -462,6 +462,80 @@ def water_carbon_data():
 
     return jsonify(result.to_dict(orient="records"))
 
+# --- API endpoint: /api/data_center_summary ---
+@app.route('/api/data_center_summary', methods=['GET'])
+def data_center_summary():
+    if not os.path.exists(DC_CSV):
+        return jsonify({"error": "Data Center CSV not found"}), 404
+
+    try:
+        df = pd.read_csv(DC_CSV)
+
+        # -------- CLEANING --------
+        df['Facility size (sq ft) Clean'] = (
+            df['Facility size (sq ft)']
+            .astype(str)
+            .str.replace(r'[",]', '', regex=True)
+        )
+        df['Facility size (sq ft) Clean'] = pd.to_numeric(
+            df['Facility size (sq ft) Clean'], errors='coerce'
+        )
+
+        df_size_clean = df.dropna(subset=['Facility size (sq ft) Clean']).copy()
+        df_size_clean['Size_Million_sq_ft'] = (
+            df_size_clean['Facility size (sq ft) Clean'] / 1_000_000
+        )
+
+        # -------- TABLE 1: STATUS COUNTS --------
+        status_counts = (
+            df['Status']
+            .value_counts()
+            .reset_index()
+            .rename(columns={'index': 'Status', 'Status': 'Count'})
+            .fillna(0)
+        )
+
+        # -------- TABLE 2: TOP 10 STATES --------
+        state_counts = (
+            df['State']
+            .value_counts()
+            .nlargest(10)
+            .reset_index()
+            .rename(columns={'index': 'State', 'State': 'Count'})
+            .fillna(0)
+        )
+
+        # -------- TABLE 3: TOP 10 OPERATORS --------
+        operator_counts = (
+            df['Operator']
+            .replace(["", " ", "None", "Unknown"], pd.NA)
+            .dropna()
+            .value_counts()
+            .nlargest(10)
+            .reset_index()
+            .rename(columns={'index': 'Operator', 'Operator': 'Count'})
+            .fillna(0)
+        )
+
+        # -------- TABLE 4: FACILITY SIZE DISTRIBUTION --------
+        size_distribution = df_size_clean[['Name', 'State', 'Size_Million_sq_ft']].fillna(0)
+
+        # Convert NaN to None for JSON compatibility
+        def replace_nan_with_none(df):
+            return df.where(pd.notnull(df), None)
+
+        return jsonify({
+            "timestamp": datetime.now(pytz.utc).isoformat(),
+            "status_counts": replace_nan_with_none(status_counts).to_dict(orient='records'),
+            "top_states": replace_nan_with_none(state_counts).to_dict(orient='records'),
+            "top_operators": replace_nan_with_none(operator_counts).to_dict(orient='records'),
+            "size_distribution": replace_nan_with_none(size_distribution).to_dict(orient='records'),
+        })
+
+    except Exception as e:
+        return jsonify({"error": f"Failed to load summary tables: {str(e)}"}), 500
+
+
 
 # --- Test endpoint ---
 @app.route('/test', methods=['GET'])

@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Air Quality & Data Centers Map</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality & Data Centers Map</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdn.jsdelivr.net/npm/daisyui@3.3.1/dist/full.css" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.3.1/dist/full.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+    <style>
+        html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hidden; background:#111827; }
+        #map {
+            position: absolute;
+            top: 120px; /* was 100px, give extra space */
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
 <style>
 .dc-icon i { color: white !important; }
 html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hidden; background:#111827; }
@@ -21,220 +30,220 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   left: 0;
 }
 
-/* Monitor Panel */
-#monitor-panel {
-  position:absolute; top:50%; left:10px; transform:translateY(-50%);
-  background:rgba(30,41,59,0.95); color:#fff; padding:12px 16px;
-  border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5); z-index:500;
-  font-size:0.9rem; display:flex; flex-direction:column; gap:4px;
-}
+        /* Monitor Panel */
+        #monitor-panel {
+            position:absolute; top:50%; left:10px; transform:translateY(-50%);
+            background:rgba(30,41,59,0.95); color:#fff; padding:12px 16px;
+            border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5); z-index:500;
+            font-size:0.9rem; display:flex; flex-direction:column; gap:4px;
+        }
 
-/* Data Center Info Tab - Small */
-#dc-info-tab {
-  position: absolute;
-  top: calc(50% - 200px);
-  left: 10px;
-  transform: translateY(-50%);
-  background: rgba(15, 42, 66, 0.95);
-  color: #fff;
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-  z-index: 510;
-  width: 260px;           /* slightly bigger */
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
+        /* Data Center Info Tab - Small */
+        #dc-info-tab {
+            position: absolute;
+            top: calc(50% - 200px);
+            left: 10px;
+            transform: translateY(-50%);
+            background: rgba(15, 42, 66, 0.95);
+            color: #fff;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            z-index: 510;
+            width: 260px;          /* slightly bigger */
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
 
-#dc-info-tab div {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+        #dc-info-tab div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-#dc-info-tab .dc-icon-small {
-  width: 22px;            /* bigger icon container */
-  display: inline-block;
-  text-align: center;
-}
+        #dc-info-tab .dc-icon-small {
+            width: 22px;             /* bigger icon container */
+            display: inline-block;
+            text-align: center;
+        }
 
-#dc-info-tab .dc-icon-small i {
-  font-size: 18px;        /* slightly larger icons */
-}
+        #dc-info-tab .dc-icon-small i {
+            font-size: 18px;         /* slightly larger icons */
+        }
 
-/* Data Center Info Tab - Expanded / Large */
-#dc-info-tab.large {
-  width: 420px;
-  height: 520px;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  overflow-y: auto;
-  font-size: 1rem;
-  padding: 24px;
-  flex-direction: column;
-  gap: 14px;
-  cursor: default;
-}
+        /* Data Center Info Tab - Expanded / Large */
+        #dc-info-tab.large {
+            width: 420px;
+            height: 520px;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            overflow-y: auto;
+            font-size: 1rem;
+            padding: 24px;
+            flex-direction: column;
+            gap: 14px;
+            cursor: default;
+        }
 
-/* Close Button */
-#dc-info-tab #close-dc-tab {
-  align-self: flex-end;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-/* More Insights panel for Water */
-#more-insights {
-  position:absolute;
-  top:50%;
-  left:10px;
-  transform:translateY(-50%);
-  background:rgba(30,41,59,0.95);
-  color:#fff;
-  padding:10px 12px;
-  border-radius:10px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.5);
-  z-index:510;
-  display:none;
-  flex-direction:column;
-  gap:8px;
-  font-size:0.85rem;
-}
-#more-insights .insight-item { cursor:pointer; display:flex; align-items:center; gap:6px; }
+        /* Close Button */
+        #dc-info-tab #close-dc-tab {
+            align-self: flex-end;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        /* More Insights panel for Water */
+        #more-insights {
+            position:absolute;
+            top:50%;
+            left:10px;
+            transform:translateY(-50%);
+            background:rgba(30,41,59,0.95);
+            color:#fff;
+            padding:10px 12px;
+            border-radius:10px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.5);
+            z-index:510;
+            display:none;
+            flex-direction:column;
+            gap:8px;
+            font-size:0.85rem;
+        }
+        #more-insights .insight-item { cursor:pointer; display:flex; align-items:center; gap:6px; }
 
-/* Central Graph Panel (Water vs Carbon) */
-#insight-graph-panel {
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  width:80vw;       /* increased width relative to viewport */
-  height:70vh;      /* increased height relative to viewport */
-  max-width:1200px; /* optional max limits */
-  max-height:900px;
-  background:rgba(15,42,66,0.95);
-  border-radius:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.5);
-  color:#fff;
-  display:none;
-  flex-direction:column;
-  z-index:600;
-  padding:20px;
-  overflow:auto;     /* allow scrolling if needed */
-}
+        /* Central Graph Panel (Water vs Carbon) */
+        #insight-graph-panel {
+            position:absolute;
+            top:50%;
+            left:50%;
+            transform:translate(-50%, -50%);
+            width:80vw;        /* increased width relative to viewport */
+            height:70vh;       /* increased height relative to viewport */
+            max-width:1200px; /* optional max limits */
+            max-height:900px;
+            background:rgba(15,42,66,0.95);
+            border-radius:12px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.5);
+            color:#fff;
+            display:none;
+            flex-direction:column;
+            z-index:600;
+            padding:20px;
+            overflow:auto;      /* allow scrolling if needed */
+        }
 
-/* Graph placeholder fills the panel */
-#graph-placeholder {
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:2px dashed #6EC1E4;
-  color:#6EC1E4;
-  width:100%;
-  height:100%;
-}
+        /* Graph placeholder fills the panel */
+        #graph-placeholder {
+            flex:1;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border:2px dashed #6EC1E4;
+            color:#6EC1E4;
+            width:100%;
+            height:100%;
+        }
 
-/* Inner canvas fills placeholder */
-#graph-placeholder canvas {
-  width:100% !important;
-  height:100% !important;
-}
+        /* Inner canvas fills placeholder */
+        #graph-placeholder canvas {
+            width:100% !important;
+            height:100% !important;
+        }
 
-/* Carbon Projection Modal */
-#carbon-projection-modal {
-  display: none;             /* Hidden initially */
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px;
-  height: 400px;
-  background: rgba(15,42,66,0.95);
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  color: #fff;
-  z-index: 600;
-  padding: 20px;
-  flex-direction: column;
-}
+        /* Carbon Projection Modal */
+        #carbon-projection-modal {
+            display: none;             /* Hidden initially */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 400px;
+            background: rgba(15,42,66,0.95);
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            color: #fff;
+            z-index: 600;
+            padding: 20px;
+            flex-direction: column;
+        }
 
-/* Make the chart canvas fill the modal */
-#carbonProjectionChart {
-  flex: 1;              /* Fill the parent container */
-  width: 100% !important;
-  height: 100% !important;
-}
+        /* Make the chart canvas fill the modal */
+        #carbonProjectionChart {
+            flex: 1;              /* Fill the parent container */
+            width: 100% !important;
+            height: 100% !important;
+        }
 
-/* Footer & Ribbon */
-#footer-timestamp { position:absolute; bottom:10px; right:15px; background:rgba(30,41,59,0.85); padding:6px 12px;
-  border-radius:10px; color:#f0f0f0; font-size:0.8rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:500; }
+        /* Footer & Ribbon */
+        #footer-timestamp { position:absolute; bottom:10px; right:15px; background:rgba(30,41,59,0.85); padding:6px 12px;
+            border-radius:10px; color:#f0f0f0; font-size:0.8rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:500; }
 
-/* Title Ribbon */
-#title-ribbon {
-  height: 60px; /* taller */
-  line-height: 60px; /* vertically center text */
-  font-size: 1.8rem; /* bigger text */
-  font-weight: 700;
-  background: linear-gradient(to right,#0f2b42,#1a3c54);
-  text-align: center;
-  color: #e0e0e0;
-}
+        /* Title Ribbon */
+        #title-ribbon {
+            height: 60px; /* taller */
+            line-height: 60px; /* vertically center text */
+            font-size: 1.8rem; /* bigger text */
+            font-weight: 700;
+            background: linear-gradient(to right,#0f2b42,#1a3c54);
+            text-align: center;
+            color: #e0e0e0;
+        }
 
-/* Navigation Ribbon */
-#nav-ribbon {
-  height: 60px; /* taller */
-  line-height: 60px; /* vertically center items */
-  background: #1a3c54;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-}
+        /* Navigation Ribbon */
+        #nav-ribbon {
+            height: 60px; /* taller */
+            line-height: 60px; /* vertically center items */
+            background: #1a3c54;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
 
-.nav-item {
-  font-size: 1.1rem; /* slightly bigger nav options */
-  padding: 0 18px;
-  line-height: 60px; /* match ribbon height */
-}
-.nav-item:hover { background:rgba(255,255,255,0.1); border-radius:6px; }
-.nav-item.active { border-bottom:3px solid #6EC1E4; }
+        .nav-item {
+            font-size: 1.1rem; /* slightly bigger nav options */
+            padding: 0 18px;
+            line-height: 60px; /* match ribbon height */
+        }
+        .nav-item:hover { background:rgba(255,255,255,0.1); border-radius:6px; }
+        .nav-item.active { border-bottom:3px solid #6EC1E4; }
 
-.legend { position:absolute; bottom:10px; left:10px; background:rgba(30,41,59,0.9); color:#fff;
-  padding:10px; border-radius:8px; font-size:0.8rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:500; }
-.legend div { display:flex; align-items:center; margin-bottom:4px; }
-.legend span { display:inline-block; width:16px; height:16px; margin-right:6px; border-radius:4px; }
+        .legend { position:absolute; bottom:10px; left:10px; background:rgba(30,41,59,0.9); color:#fff;
+            padding:10px; border-radius:8px; font-size:0.8rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:500; }
+        .legend div { display:flex; align-items:center; margin-bottom:4px; }
+        .legend span { display:inline-block; width:16px; height:16px; margin-right:6px; border-radius:4px; }
 
-#hover-aqi { position:absolute; pointer-events:none; padding:6px 10px; background:rgba(30,41,59,0.9);
-  color:#fff; border-radius:8px; font-size:0.85rem; z-index:600; display:none; }
+        #hover-aqi { position:absolute; pointer-events:none; padding:6px 10px; background:rgba(30,41,59,0.9);
+            color:#fff; border-radius:8px; font-size:0.85rem; z-index:600; display:none; }
 
-.dc-icon i { pointer-events:none; }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        .dc-icon i { pointer-events:none; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<div id="header-wrapper">
-  <div id="title-ribbon">Environmental Impact of Data Centers</div>
-  <div id="nav-ribbon">
-    <div class="flex gap-3">
-      <div class="nav-item active" data-layer="air">Air Quality</div>
-      <div class="nav-item" data-layer="water">Water</div>
-      <div class="nav-item" data-layer="power">Power</div>
-      <div class="nav-item" data-layer="co2">CO2</div>
+    <div id="header-wrapper">
+        <div id="title-ribbon">Environmental Impact of Data Centers</div>
+        <div id="nav-ribbon">
+            <div class="flex gap-3">
+                <div class="nav-item active" data-layer="air">Air Quality</div>
+                <div class="nav-item" data-layer="water">Water</div>
+                <div class="nav-item" data-layer="power">Power</div>
+                <div class="nav-item" data-layer="co2">CO2</div>
+                <div class="nav-item" data-layer="summary">Data Centers Summary</div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- DC Info Tab -->
-<div id="dc-info-tab">
-  <button id="close-dc-tab">✖</button>
+    <div id="dc-info-tab">
+        <button id="close-dc-tab">✖</button>
 
   <div>
     <span class="dc-icon-small"><i class="fas fa-database" style="color:whitesmoke;"></i></span>
@@ -276,115 +285,112 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   </div>
 </div>
 
-<!-- Directions Button -->
-<div id="directions-btn"
-     style="
-       position: fixed;
-       bottom: 20px;
-       right: 20px;
-       background-color: #1e40af;
-       color: white;
-       padding: 8px 12px;
-       border-radius: 12px;
-       cursor: pointer;
-       z-index: 550;
-       font-size: 0.85rem;
-       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-       transition: all 0.2s ease;
-     ">
-  Directions on Navigating the Page
-</div>
+    <div id="directions-btn"
+        style="
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e40af;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 550;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        ">
+        Directions on Navigating the Page
+    </div>
 
-<!-- Info Box -->
-<div id="map-info-box"></div>
+    <div id="map-info-box"></div>
 
-<style>
-  #map-info-box {
-    position: fixed;
-    bottom: 60px;
-    right: 20px;
-    width: 340px;
-    max-height: 400px;
-    overflow-y: auto;
-    background: rgba(30, 41, 59, 0.95);
-    color: #f0f0f0;
-    padding: 18px 20px;
-    border-radius: 16px;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.6);
-    font-size: 0.92rem;
-    line-height: 1.5rem;
-    z-index: 550;
-    display: none; /* initially hidden */
-  }
+    <style>
+        #map-info-box {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            width: 340px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(30, 41, 59, 0.95);
+            color: #f0f0f0;
+            padding: 18px 20px;
+            border-radius: 16px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+            font-size: 0.92rem;
+            line-height: 1.5rem;
+            z-index: 550;
+            display: none; /* initially hidden */
+        }
 
-  #map-info-box strong {
-    color: #6EC1E4;
-  }
+        #map-info-box strong {
+            color: #6EC1E4;
+        }
 
-  #map-info-box div {
-    margin-bottom: 10px;
-  }
+        #map-info-box div {
+            margin-bottom: 10px;
+        }
 
-  #map-info-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(0,0,0,0.65);
-  }
-</style>
+        #map-info-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(0,0,0,0.65);
+        }
+    </style>
 
-<script>
-  const btn = document.getElementById('directions-btn');
-  const box = document.getElementById('map-info-box');
+    <script>
+        const btn = document.getElementById('directions-btn');
+        const box = document.getElementById('map-info-box');
 
-  const layerInfo = {
-    AirQuality: `<div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
-                 <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
-                 <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
-                 <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>`,
-    Water: `<div><strong>Map Overview:</strong> The map displays water usage across locations and data centers.</div>
-            <div><strong>Water Layer:</strong> Hover over the map to see water footprint for each location. Data is available for total water use, blue water, and grey water.</div>
-            <div><strong>Data Center Layer:</strong> Hover over a data center to view water usage details along with other metadata like city, state, size, and status.</div>
-            <div><strong>Interactions:</strong> Click a monitor or data center to explore more details and compare water usage across sites.</div>`,
-    CO2: `<div><strong>Map Overview:</strong> The map displays CO₂ emissions across locations and data centers.</div>
-          <div><strong>CO₂ Layer:</strong> Hover over the map to see emissions for each location. Emissions can be viewed per energy source or total carbon footprint.</div>
-          <div><strong>Data Center Layer:</strong> Hover over a data center to view carbon metrics, operator, city, state, project cost, and status.</div>
-          <div><strong>Interactions:</strong> Click a monitor or data center to explore CO₂ details and compare emissions between sites.</div>`
-  };
+        const layerInfo = {
+            AirQuality: `<div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
+                        <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
+                        <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
+                        <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>`,
+            Water: `<div><strong>Map Overview:</strong> The map displays water usage across locations and data centers.</div>
+                     <div><strong>Water Layer:</strong> Hover over the map to see water footprint for each location. Data is available for total water use, blue water, and grey water.</div>
+                     <div><strong>Data Center Layer:</strong> Hover over a data center to view water usage details along with other metadata like city, state, size, and status.</div>
+                     <div><strong>Interactions:</strong> Click a monitor or data center to explore more details and compare water usage across sites.</div>`,
+            CO2: `<div><strong>Map Overview:</strong> The map displays CO₂ emissions across locations and data centers.</div>
+                   <div><strong>CO₂ Layer:</strong> Hover over the map to see emissions for each location. Emissions can be viewed per energy source or total carbon footprint.</div>
+                   <div><strong>Data Center Layer:</strong> Hover over a data center to view carbon metrics, operator, city, state, project cost, and status.</div>
+                   <div><strong>Interactions:</strong> Click a monitor or data center to explore CO₂ details and compare emissions between sites.</div>`
+        };
 
-  function updateInfoBox(layer) {
-    box.innerHTML = layerInfo[layer] || '<div>No info available for this layer.</div>';
-  }
+        function updateInfoBox(layer) {
+            box.innerHTML = layerInfo[layer] || '<div>No info available for this layer.</div>';
+        }
 
-  // Default to AirQuality initially
-  updateInfoBox('AirQuality');
+        // Default to AirQuality initially
+        updateInfoBox('AirQuality');
 
-  btn.addEventListener('click', () => {
-    if(box.style.display === 'none'){
-      box.style.display = 'block';
-      btn.innerText = 'Hide Directions';
-    } else {
-      box.style.display = 'none';
-      btn.innerText = 'Directions on Navigating the Page';
-    }
-  });
-</script>
+        btn.addEventListener('click', () => {
+            if(box.style.display === 'none'){
+                box.style.display = 'block';
+                btn.innerText = 'Hide Directions';
+            } else {
+                box.style.display = 'none';
+                btn.innerText = 'Directions on Navigating the Page';
+            }
+        });
+    </script>
 
 
-<!-- Monitor Panel -->
-<div id="monitor-panel">
-  <strong>Monitor Layer</strong>
-  <label class="cursor-pointer label">
-    <input type="radio" name="monitor-layer" checked class="radio radio-sm mr-2"> Ozone and PM
-  </label>
-  <label class="cursor-pointer label">
-    <input type="radio" name="monitor-layer" class="radio radio-sm mr-2"> Ozone only
-  </label>
-  <label class="cursor-pointer label">
-    <input type="radio" name="monitor-layer" class="radio radio-sm mr-2"> PM2.5 only
-  </label>
-</div>
+    <div id="monitor-panel">
+        <strong>Monitor Layer</strong>
+        <label class="cursor-pointer label">
+            <input type="radio" name="monitor-layer" checked class="radio radio-sm mr-2"> Ozone and PM
+        </label>
+        <label class="cursor-pointer label">
+            <input type="radio" name="monitor-layer" class="radio radio-sm mr-2"> Ozone only
+        </label>
+        <label class="cursor-pointer label">
+            <input type="radio" name="monitor-layer" class="radio radio-sm mr-2"> PM2.5 only
+        </label>
+    </div>
 
-<div id="more-insights">
-  <strong>More Insights</strong>
+    <div id="more-insights">
+        <strong>More Insights</strong>
 
   <!-- Existing Fuel Type -->
   <div class="insight-item" data-type="fuel">
@@ -397,147 +403,192 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   </div>
 </div>
 
-<!-- Carbon Projection Modal -->
-<div id="carbon-projection-modal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-     width:600px; height:400px; background:rgba(15,42,66,0.95); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5);
-     color:#fff; z-index:600; padding:20px; display:flex; flex-direction:column;">
-  <button id="close-carbon-projection" style="align-self:flex-end; background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✖</button>
-  <div style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Carbon Projections</div>
-  <canvas id="carbonProjectionChart"></canvas>
-</div>
+    <div id="carbon-projection-modal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+        width:600px; height:400px; background:rgba(15,42,66,0.95); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5);
+        color:#fff; z-index:600; padding:20px; display:flex; flex-direction:column;">
+        <button id="close-carbon-projection" style="align-self:flex-end; background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✖</button>
+        <div style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Carbon Projections</div>
+        <canvas id="carbonProjectionChart"></canvas>
+    </div>
 
 
+    <div id="insight-graph-panel">
+        <button id="close-graph-panel">✖</button>
+        <div id="graph-title" style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Fuel Type Analysis</div>
+        <div id="graph-placeholder">Graph Placeholder</div>
+    </div>
+    <style>
+        /* Full overlay covering the map */
+        #summary-overlay {
+            position: absolute;
+            top: 120px; /* adjust to map header */
+            bottom: 0;
+            right: 0;
+            left: 0;
+            z-index: 550;
+            background: #111827;
+            display: none; /* initially hidden */
+            padding: 10px;
+            box-sizing: border-box;
+        }
 
-<!-- Central Graph Panel -->
-<div id="insight-graph-panel">
-  <button id="close-graph-panel">✖</button>
-  <div id="graph-title" style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Fuel Type Analysis</div>
-  <div id="graph-placeholder">Graph Placeholder</div>
-</div>
+        /* Update this section in your main <style> block or the injected <style> block */
 
-<div id="map"></div>
+        /* 2x2 grid for charts */
+        #summary-grid {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            grid-template-columns: 1fr 1fr; /* Keep 1fr 1fr for equal columns */
+            grid-template-rows: 1fr 1fr;    /* Keep 1fr 1fr for equal rows */
+            gap: 12px;
+        }
 
-<!-- Water Projection Modal -->
-<div id="water-projection-modal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-     width:600px; height:400px; background:rgba(15,42,66,0.95); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5);
-     color:#fff; z-index:600; padding:20px; flex-direction:column;">
-  <button id="close-water-projection" style="align-self:flex-end; background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✖</button>
-  <div style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Water Projections</div>
-  <canvas id="waterProjectionChart" width="560" height="300"></canvas>
-</div>
+        /* Each grid box - IMPORTANT UPDATE */
+        .grid-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
 
-<!-- State Filter -->
-<select id="state-filter" style="
-    position: absolute;
-    top: 35%;
-    right: 20px;
-    z-index: 550;
-    background: rgba(30,41,59,0.95);
-    color: #fff;
-    border-radius: 6px;
-    padding: 6px 10px;
-    border: 1px solid #ccc;
-    font-size: 0.9rem;
-    width: 150px;
-    max-width: 150px;
-    overflow-y: auto;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-" size="5">
-  <option value="all">All States</option>
-</select>
+            /* Ensure content fills the space and handles overflow */
+            display: flex; /* Ensures canvas fills the box */
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            overflow: hidden; /* Prevent labels/bars from forcing the layout wide */
+            box-sizing: border-box; /* Crucial for padding to work with width/height */
+        }
 
-<!-- Fuel Filter -->
-<select id="fuel-filter" style="
-    position: absolute;
-    top: 45%;
-    right: 20px;
-    z-index: 550;
-    background: rgba(30,41,59,0.95);
-    color: #fff;
-    border-radius: 6px;
-    padding: 6px 10px;
-    border: 1px solid #ccc;
-    font-size: 0.9rem;
-    width: 150px;
-    max-width: 150px;
-    overflow-y: auto;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-" size="5">
-  <option value="all">All Fuels</option>
-</select>
+        /* Make the canvas fill the grid box */
+        .grid-box canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
 
-<!-- Subbasin Filter -->
-<select id="subbasin-filter" style="
-    position: absolute;
-    top: 55%;
-    right: 20px;
-    z-index: 550;
-    background: rgba(30,41,59,0.95);
-    color: #fff;
-    border-radius: 6px;
-    padding: 6px 10px;
-    border: 1px solid #ccc;
-    font-size: 0.9rem;
-    width: 150px;
-    max-width: 150px;
-    overflow-y: auto;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-" size="5">
-  <option value="all">All Subbasins</option>
-</select>
-<style>
-/* Hide filters by default */
-  #state-filter, #fuel-filter, #subbasin-filter {
-      display: none; /* hide by default */
-  }
-</style>
+    <div id="summary-overlay">
+        <div id="summary-grid">
+            <div class="grid-box"><canvas id="plot-status"></canvas></div>
+            <div class="grid-box"><canvas id="plot-states"></canvas></div>
+            <div class="grid-box"><canvas id="plot-operators"></canvas></div>
+            <div class="grid-box"><canvas id="plot-size"></canvas></div>
+        </div>
+    </div>
+    <div id="map"></div>
+
+    <div id="water-projection-modal" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+        width:600px; height:400px; background:rgba(15,42,66,0.95); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5);
+        color:#fff; z-index:600; padding:20px; flex-direction:column;">
+        <button id="close-water-projection" style="align-self:flex-end; background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✖</button>
+        <div style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Water Projections</div>
+        <canvas id="waterProjectionChart" width="560" height="300"></canvas>
+    </div>
+
+    <select id="state-filter" style="
+        position: absolute;
+        top: 35%;
+        right: 20px;
+        z-index: 550;
+        background: rgba(30,41,59,0.95);
+        color: #fff;
+        border-radius: 6px;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        font-size: 0.9rem;
+        width: 150px;
+        max-width: 150px;
+        overflow-y: auto;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    " size="5">
+        <option value="all">All States</option>
+    </select>
+
+    <select id="fuel-filter" style="
+        position: absolute;
+        top: 45%;
+        right: 20px;
+        z-index: 550;
+        background: rgba(30,41,59,0.95);
+        color: #fff;
+        border-radius: 6px;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        font-size: 0.9rem;
+        width: 150px;
+        max-width: 150px;
+        overflow-y: auto;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    " size="5">
+        <option value="all">All Fuels</option>
+    </select>
+
+    <select id="subbasin-filter" style="
+        position: absolute;
+        top: 55%;
+        right: 20px;
+        z-index: 550;
+        background: rgba(30,41,59,0.95);
+        color: #fff;
+        border-radius: 6px;
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        font-size: 0.9rem;
+        width: 150px;
+        max-width: 150px;
+        overflow-y: auto;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    " size="5">
+        <option value="all">All Subbasins</option>
+    </select>
+    <style>
+        /* Hide filters by default */
+        #state-filter, #fuel-filter, #subbasin-filter {
+            display: none; /* hide by default */
+        }
+    </style>
 
 
+    <div id="footer-timestamp">Loading data...</div>
+    <div id="hover-aqi"></div>
+    <div class="legend" id="legend"></div>
 
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
+    <script>
+        const startZoom = 5;
+        const map = L.map('map', {
+            center: [39.5, -98.35],  // center of continental US
+            zoom: startZoom,          // starting zoom
+            minZoom: startZoom,       // restrict zoom out to starting zoom
+            maxZoom: startZoom + 3    // allow zoom in only 3 steps
+        });
 
-<div id="footer-timestamp">Loading data...</div>
-<div id="hover-aqi"></div>
-<div class="legend" id="legend"></div>
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 19              // tile layer maxZoom
+        }).addTo(map);
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-
-<script>
-const startZoom = 5;
-const map = L.map('map', {
-    center: [39.5, -98.35],  // center of continental US
-    zoom: startZoom,          // starting zoom
-    minZoom: startZoom,       // restrict zoom out to starting zoom
-    maxZoom: startZoom + 3    // allow zoom in only 3 steps
-});
-
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    subdomains: 'abcd',
-    maxZoom: 19              // tile layer maxZoom
-}).addTo(map);
-
-let currentPollutant = "all";
-let monitorData = [];
-let waterData = [];
-let dcMarkers = [];
-let heatLayer = null;
-let currentLayer = "air";
-let initialLoad = true; // flag for first load
-let carbonMarkers = []; // keep track of CO2 circle markers
-let waterHeatLayer = null; // add at the top with other globals
-let waterMarkers = []; // global
-let waterPulseInterval = null; // store interval so we can clear it
-let aqiMarkers = []; // track AQI circle markers
-let powerData = [];
-let powerMarkers = [];
-let powerHeatLayer = null;
-let powerPulseInterval = null;
-
+        let currentPollutant = "all";
+        let monitorData = [];
+        let waterData = [];
+        let dcMarkers = [];
+        let heatLayer = null;
+        let currentLayer = "air";
+        let initialLoad = true; // flag for first load
+        let carbonMarkers = []; // keep track of CO2 circle markers
+        let waterHeatLayer = null; // add at the top with other globals
+        let waterMarkers = []; // global
+        let waterPulseInterval = null; // store interval so we can clear it
+        let aqiMarkers = []; // track AQI circle markers
+        let powerData = [];
+        let powerMarkers = [];
+        let powerHeatLayer = null;
+        let powerPulseInterval = null;
 
 
 // --- Legends ---
@@ -574,21 +625,21 @@ function setLegend(layer){
   `;
 }
 
-}
+        }
 
-// --- Load Data Centers ---
-async function loadDataCenters() {
-  try {
-    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/monitors');
-    const data = await res.json();
-    if (!data.data_centers || data.data_centers.length === 0) return;
+        // --- Load Data Centers ---
+        async function loadDataCenters() {
+            try {
+                const res = await fetch('https://data-center-map-nu1d.onrender.com/api/monitors');
+                const data = await res.json();
+                if (!data.data_centers || data.data_centers.length === 0) return;
 
-    // Remove old markers
-    dcMarkers.forEach(m => map.removeLayer(m));
-    dcMarkers = [];
+                // Remove old markers
+                dcMarkers.forEach(m => map.removeLayer(m));
+                dcMarkers = [];
 
-    data.data_centers.forEach(dc => {
-      if (!dc.lat || !dc.lon) return;
+                data.data_centers.forEach(dc => {
+                    if (!dc.lat || !dc.lon) return;
 
       const marker = L.marker([Number(dc.lat), Number(dc.lon)], {
         icon: L.divIcon({
@@ -597,326 +648,321 @@ async function loadDataCenters() {
         })
       }).addTo(map);
 
-      marker.on('click', () => {
-    const tab = document.getElementById('dc-info-tab');
-    // Ensure the tab is small when opened by removing the 'large' class
-    tab.classList.remove('large'); 
-    tab.style.display = 'flex';
-    
-    // Populate the data center info tab with data
-    document.getElementById('dc-name').innerText = dc.Name || 'N/A';
-    document.getElementById('dc-operator').innerText = dc.Operator || 'N/A';
-    document.getElementById('dc-power').innerText = dc.PowerSource || 'N/A';
-    document.getElementById('dc-cooling').innerText = dc.CoolingSource || 'N/A';
-    document.getElementById('dc-city').innerText = dc.City || 'N/A';
-    document.getElementById('dc-state').innerText = dc.State || 'N/A';
-    document.getElementById('dc-size').innerText = dc.PropertySizeAcres || 'N/A';
-    document.getElementById('dc-cost').innerText = dc.ProjectCost || 'N/A';
-    document.getElementById('dc-status').innerText = dc.Status || 'N/A';
-});
+                    marker.on('click', () => {
+                        const tab = document.getElementById('dc-info-tab');
+                        // Ensure the tab is small when opened by removing the 'large' class
+                        tab.classList.remove('large');
+                        tab.style.display = 'flex';
 
-      dcMarkers.push(marker);
-    });
+                        // Populate the data center info tab with data
+                        document.getElementById('dc-name').innerText = dc.Name || 'N/A';
+                        document.getElementById('dc-operator').innerText = dc.Operator || 'N/A';
+                        document.getElementById('dc-power').innerText = dc.PowerSource || 'N/A';
+                        document.getElementById('dc-cooling').innerText = dc.CoolingSource || 'N/A';
+                        document.getElementById('dc-city').innerText = dc.City || 'N/A';
+                        document.getElementById('dc-state').innerText = dc.State || 'N/A';
+                        document.getElementById('dc-size').innerText = dc.PropertySizeAcres || 'N/A';
+                        document.getElementById('dc-cost').innerText = dc.ProjectCost || 'N/A';
+                        document.getElementById('dc-status').innerText = dc.Status || 'N/A';
+                    });
 
-  } catch (error) {
-    console.error('Error loading data centers:', error);
-  }
-}
+                    dcMarkers.push(marker);
+                });
 
-
-// --- Load AQI Heatmap ---
-async function loadAQIHeatmap(){
-  try {
-    const res = await fetch(`https://data-center-map-nu1d.onrender.com/api/monitors?pollutant=${currentPollutant}`);
-    const data = await res.json();
-    monitorData = data.monitors||[];
-
-    if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; }
-
-    const points = monitorData.map(m=>[m.lat, m.lon, Math.min(m.aqi/500,0.6)]);
-    heatLayer = L.heatLayer(points,{radius:15,blur:8,maxZoom:10,gradient:{0:'green',0.3:'yellow',0.6:'orange',0.8:'red',1:'purple'}}).addTo(map);
-
-    // Add invisible circle markers for tooltips **only if Air layer active**
-    if(currentLayer==="air"){
-      aqiMarkers.forEach(m => map.removeLayer(m)); // clear old AQI markers
-      aqiMarkers = [];
-
-      monitorData.forEach(m => {
-        const marker = L.circleMarker([m.lat, m.lon], {radius:0.1, opacity:0})
-          .addTo(map)
-          .bindTooltip(`AQI: ${m.aqi}`, {direction:'top', className:'aqi-tooltip'});
-        aqiMarkers.push(marker); // store marker for later clearing
-      });
-    }
+            } catch (error) {
+                console.error('Error loading data centers:', error);
+            }
+        }
 
 
-    document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
-    setLegend('air');
-  } catch(err){ console.error(err); }
-}
+        // --- Load AQI Heatmap ---
+        async function loadAQIHeatmap(){
+            try {
+                const res = await fetch(`https://data-center-map-nu1d.onrender.com/api/monitors?pollutant=${currentPollutant}`);
+                const data = await res.json();
+                monitorData = data.monitors||[];
+
+                if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; }
+
+                const points = monitorData.map(m=>[m.lat, m.lon, Math.min(m.aqi/500,0.6)]);
+                heatLayer = L.heatLayer(points,{radius:15,blur:8,maxZoom:10,gradient:{0:'green',0.3:'yellow',0.6:'orange',0.8:'red',1:'purple'}}).addTo(map);
+
+                // Add invisible circle markers for tooltips **only if Air layer active**
+                if(currentLayer==="air"){
+                    aqiMarkers.forEach(m => map.removeLayer(m)); // clear old AQI markers
+                    aqiMarkers = [];
+
+                    monitorData.forEach(m => {
+                        const marker = L.circleMarker([m.lat, m.lon], {radius:0.1, opacity:0})
+                            .addTo(map)
+                            .bindTooltip(`AQI: ${m.aqi}`, {direction:'top', className:'aqi-tooltip'});
+                        aqiMarkers.push(marker); // store marker for later clearing
+                    });
+                }
 
 
+                document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+                setLegend('air');
+            } catch(err){ console.error(err); }
+        }
 
 
-async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
-  try {
-    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water');
-    const data = await res.json();
-    let waterData = data.points || [];
-    if (!waterData.length) return;
+        async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
+            try {
+                const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water');
+                const data = await res.json();
+                let waterData = data.points || [];
+                if (!waterData.length) return;
 
-    // --- Apply filters for plotting only ---
-    let filteredForPlot = waterData.slice();
-    if (selectedState !== "all") filteredForPlot = filteredForPlot.filter(p => p.state === selectedState);
-    if (selectedFuel !== "all") filteredForPlot = filteredForPlot.filter(p => p.primary_fuel === selectedFuel);
-    if (selectedSubbasin !== "all") filteredForPlot = filteredForPlot.filter(p => p.subbasin === selectedSubbasin);
+                // --- Apply filters for plotting only ---
+                let filteredForPlot = waterData.slice();
+                if (selectedState !== "all") filteredForPlot = filteredForPlot.filter(p => p.state === selectedState);
+                if (selectedFuel !== "all") filteredForPlot = filteredForPlot.filter(p => p.primary_fuel === selectedFuel);
+                if (selectedSubbasin !== "all") filteredForPlot = filteredForPlot.filter(p => p.subbasin === selectedSubbasin);
 
-    // --- Compute allowed values for dropdowns based on other selections ---
-    const filteredStates = [...new Set(
-      waterData
-        .filter(p => (selectedFuel === "all" || p.primary_fuel === selectedFuel) &&
-                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
-        .map(p => p.state).filter(Boolean)
-    )].sort();
+                // --- Compute allowed values for dropdowns based on other selections ---
+                const filteredStates = [...new Set(
+                    waterData
+                        .filter(p => (selectedFuel === "all" || p.primary_fuel === selectedFuel) &&
+                                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+                        .map(p => p.state).filter(Boolean)
+                )].sort();
 
-    const filteredFuels = [...new Set(
-      waterData
-        .filter(p => (selectedState === "all" || p.state === selectedState) &&
-                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
-        .map(p => p.primary_fuel).filter(Boolean)
-    )].sort();
+                const filteredFuels = [...new Set(
+                    waterData
+                        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+                        .map(p => p.primary_fuel).filter(Boolean)
+                )].sort();
 
-    const filteredSubbasins = [...new Set(
-      waterData
-        .filter(p => (selectedState === "all" || p.state === selectedState) &&
-                     (selectedFuel === "all" || p.primary_fuel === selectedFuel))
-        .map(p => p.subbasin).filter(Boolean)
-    )].sort();
+                const filteredSubbasins = [...new Set(
+                    waterData
+                        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                                     (selectedFuel === "all" || p.primary_fuel === selectedFuel))
+                        .map(p => p.subbasin).filter(Boolean)
+                )].sort();
 
-    // --- Populate STATE DROPDOWN ---
-    const stateSelect = document.getElementById('state-filter');
-    if (stateSelect) {
-      stateSelect.innerHTML = '';
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.text = 'All States';
-      allOption.selected = selectedState === 'all';
-      stateSelect.appendChild(allOption);
+                // --- Populate STATE DROPDOWN ---
+                const stateSelect = document.getElementById('state-filter');
+                if (stateSelect) {
+                    stateSelect.innerHTML = '';
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All States';
+                    allOption.selected = selectedState === 'all';
+                    stateSelect.appendChild(allOption);
 
-      filteredStates.forEach(s => {
-        const option = document.createElement('option');
-        option.value = s;
-        option.text = s;
-        if (s === selectedState) option.selected = true;
-        stateSelect.appendChild(option);
-      });
+                    filteredStates.forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s;
+                        option.text = s;
+                        if (s === selectedState) option.selected = true;
+                        stateSelect.appendChild(option);
+                    });
 
-      stateSelect.size = 1;
-    }
+                    stateSelect.size = 1;
+                }
 
-    // --- Populate FUEL DROPDOWN ---
-    const fuelSelect = document.getElementById('fuel-filter');
-    if (fuelSelect) {
-      fuelSelect.innerHTML = '';
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.text = 'All Fuels';
-      allOption.selected = selectedFuel === 'all';
-      fuelSelect.appendChild(allOption);
+                // --- Populate FUEL DROPDOWN ---
+                const fuelSelect = document.getElementById('fuel-filter');
+                if (fuelSelect) {
+                    fuelSelect.innerHTML = '';
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All Fuels';
+                    allOption.selected = selectedFuel === 'all';
+                    fuelSelect.appendChild(allOption);
 
-      filteredFuels.forEach(f => {
-        const option = document.createElement('option');
-        option.value = f;
-        option.text = f;
-        if (f === selectedFuel) option.selected = true;
-        fuelSelect.appendChild(option);
-      });
+                    filteredFuels.forEach(f => {
+                        const option = document.createElement('option');
+                        option.value = f;
+                        option.text = f;
+                        if (f === selectedFuel) option.selected = true;
+                        fuelSelect.appendChild(option);
+                    });
 
-      fuelSelect.size = 1;
-    }
+                    fuelSelect.size = 1;
+                }
 
-    // --- Populate SUBBASIN DROPDOWN ---
-    const subbasinSelect = document.getElementById('subbasin-filter');
-    if (subbasinSelect) {
-      subbasinSelect.innerHTML = '';
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.text = 'All Subbasins';
-      allOption.selected = selectedSubbasin === 'all';
-      subbasinSelect.appendChild(allOption);
+                // --- Populate SUBBASIN DROPDOWN ---
+                const subbasinSelect = document.getElementById('subbasin-filter');
+                if (subbasinSelect) {
+                    subbasinSelect.innerHTML = '';
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All Subbasins';
+                    allOption.selected = selectedSubbasin === 'all';
+                    subbasinSelect.appendChild(allOption);
 
-      filteredSubbasins.forEach(sb => {
-        const option = document.createElement('option');
-        option.value = sb;
-        option.text = sb;
-        if (sb === selectedSubbasin) option.selected = true;
-        subbasinSelect.appendChild(option);
-      });
+                    filteredSubbasins.forEach(sb => {
+                        const option = document.createElement('option');
+                        option.value = sb;
+                        option.text = sb;
+                        if (sb === selectedSubbasin) option.selected = true;
+                        subbasinSelect.appendChild(option);
+                    });
 
-      subbasinSelect.size = 1;
-    }
+                    subbasinSelect.size = 1;
+                }
 
-    // --- Clear old markers and draw new ones ---
-    clearWaterLayer();
-    const maxFootprint = Math.max(...filteredForPlot.map(p => parseFloat(p.water_footprint) || 0));
-    waterMarkers = [];
+                // --- Clear old markers and draw new ones ---
+                clearWaterLayer();
+                const maxFootprint = Math.max(...filteredForPlot.map(p => parseFloat(p.water_footprint) || 0));
+                waterMarkers = [];
 
-    filteredForPlot.forEach(p => {
-      const footprint = parseFloat(p.water_footprint) || 0;
-      const intensity = Math.min(footprint / maxFootprint, 1.0);
-      const baseRadius = 4 + intensity * 12;
+                filteredForPlot.forEach(p => {
+                    const footprint = parseFloat(p.water_footprint) || 0;
+                    const intensity = Math.min(footprint / maxFootprint, 1.0);
+                    const baseRadius = 4 + intensity * 12;
 
-      const color = intensity < 0.2 ? '#3B82F6' :
-                    intensity < 0.4 ? '#0EA5E9' :
-                    intensity < 0.6 ? '#06B6D4' :
-                    intensity < 0.8 ? '#22C55E' :
-                    '#F87171';
+                    const color = intensity < 0.2 ? '#3B82F6' :
+                                   intensity < 0.4 ? '#0EA5E9' :
+                                   intensity < 0.6 ? '#06B6D4' :
+                                   intensity < 0.8 ? '#22C55E' :
+                                   '#F87171';
 
-      const circle = L.circleMarker([p.lat, p.lon], {
-        radius: baseRadius,
-        color,
-        fillColor: color,
-        fillOpacity: 0.5,
-        weight: 1,
-        pane: 'markerPane'
-      }).addTo(map);
+                    const circle = L.circleMarker([p.lat, p.lon], {
+                        radius: baseRadius,
+                        color,
+                        fillColor: color,
+                        fillOpacity: 0.5,
+                        weight: 1,
+                        pane: 'markerPane'
+                    }).addTo(map);
 
-      circle.bindTooltip(`Water footprint: ${footprint.toFixed(2)} m³/MWh`, { direction: 'top' });
-      waterMarkers.push({ circle, baseRadius, intensity });
-    });
+                    circle.bindTooltip(`Water footprint: ${footprint.toFixed(2)} m³/MWh`, { direction: 'top' });
+                    waterMarkers.push({ circle, baseRadius, intensity });
+                });
 
-    // --- Update timestamp ---
-    const footer = document.getElementById('footer-timestamp');
-    if (footer && data.timestamp) {
-      footer.innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
-    }
+                // --- Update timestamp ---
+                const footer = document.getElementById('footer-timestamp');
+                if (footer && data.timestamp) {
+                    footer.innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+                }
 
-    setLegend('water');
+                setLegend('water');
 
-  } catch (err) {
-    console.error('Error loading water heatmap:', err);
-  }
-}
-
-
+            } catch (err) {
+                console.error('Error loading water heatmap:', err);
+            }
+        }
 
 
+        async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
+            try {
+                const res = await fetch('https://data-center-map-nu1d.onrender.com/api/power');
+                const data = await res.json();
+                let powerData = data.points || [];
+                if (!powerData.length) return;
 
-async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
-  try {
-    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/power');
-    const data = await res.json();
-    let powerData = data.points || [];
-    if (!powerData.length) return;
+                // --- Apply filters for plotting only ---
+                let filteredForPlot = powerData.slice();
+                if (selectedState !== "all") filteredForPlot = filteredForPlot.filter(p => p.state === selectedState);
+                if (selectedFuel !== "all") filteredForPlot = filteredForPlot.filter(p => p.primary_fuel === selectedFuel);
+                if (selectedSubbasin !== "all") filteredForPlot = filteredForPlot.filter(p => p.subbasin === selectedSubbasin);
 
-    // --- Apply filters for plotting only ---
-    let filteredForPlot = powerData.slice();
-    if (selectedState !== "all") filteredForPlot = filteredForPlot.filter(p => p.state === selectedState);
-    if (selectedFuel !== "all") filteredForPlot = filteredForPlot.filter(p => p.primary_fuel === selectedFuel);
-    if (selectedSubbasin !== "all") filteredForPlot = filteredForPlot.filter(p => p.subbasin === selectedSubbasin);
+                // --- Compute allowed values for dropdowns based on other selections ---
+                const filteredStates = [...new Set(
+                    powerData
+                        .filter(p => (selectedFuel === "all" || p.primary_fuel === selectedFuel) &&
+                                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+                        .map(p => p.state).filter(Boolean)
+                )].sort();
 
-    // --- Compute allowed values for dropdowns based on other selections ---
-    const filteredStates = [...new Set(
-      powerData
-        .filter(p => (selectedFuel === "all" || p.primary_fuel === selectedFuel) &&
-                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
-        .map(p => p.state).filter(Boolean)
-    )].sort();
+                const filteredFuels = [...new Set(
+                    powerData
+                        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+                        .map(p => p.primary_fuel).filter(Boolean)
+                )].sort();
 
-    const filteredFuels = [...new Set(
-      powerData
-        .filter(p => (selectedState === "all" || p.state === selectedState) &&
-                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
-        .map(p => p.primary_fuel).filter(Boolean)
-    )].sort();
+                const filteredSubbasins = [...new Set(
+                    powerData
+                        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                                     (selectedFuel === "all" || p.primary_fuel === selectedFuel))
+                        .map(p => p.subbasin).filter(Boolean)
+                )].sort();
 
-    const filteredSubbasins = [...new Set(
-      powerData
-        .filter(p => (selectedState === "all" || p.state === selectedState) &&
-                     (selectedFuel === "all" || p.primary_fuel === selectedFuel))
-        .map(p => p.subbasin).filter(Boolean)
-    )].sort();
+                // --- Populate STATE DROPDOWN ---
+                const stateSelect = document.getElementById('state-filter');
+                if (stateSelect) {
+                    stateSelect.innerHTML = '';
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All States';
+                    allOption.selected = selectedState === 'all';
+                    stateSelect.appendChild(allOption);
 
-    // --- Populate STATE DROPDOWN ---
-    const stateSelect = document.getElementById('state-filter');
-    if (stateSelect) {
-      stateSelect.innerHTML = '';
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.text = 'All States';
-      allOption.selected = selectedState === 'all';
-      stateSelect.appendChild(allOption);
+                    filteredStates.forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s;
+                        option.text = s;
+                        if (s === selectedState) option.selected = true;
+                        stateSelect.appendChild(option);
+                    });
 
-      filteredStates.forEach(s => {
-        const option = document.createElement('option');
-        option.value = s;
-        option.text = s;
-        if (s === selectedState) option.selected = true;
-        stateSelect.appendChild(option);
-      });
+                    stateSelect.size = 1;
+                }
 
-      stateSelect.size = 1;
-    }
+                // --- Populate FUEL DROPDOWN ---
+                const fuelSelect = document.getElementById('fuel-filter');
+                if (fuelSelect) {
+                    fuelSelect.innerHTML = '';
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All Fuels';
+                    allOption.selected = selectedFuel === 'all';
+                    fuelSelect.appendChild(allOption);
 
-    // --- Populate FUEL DROPDOWN ---
-    const fuelSelect = document.getElementById('fuel-filter');
-    if (fuelSelect) {
-      fuelSelect.innerHTML = '';
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.text = 'All Fuels';
-      allOption.selected = selectedFuel === 'all';
-      fuelSelect.appendChild(allOption);
+                    filteredFuels.forEach(f => {
+                        const option = document.createElement('option');
+                        option.value = f;
+                        option.text = f;
+                        if (f === selectedFuel) option.selected = true;
+                        fuelSelect.appendChild(option);
+                    });
 
-      filteredFuels.forEach(f => {
-        const option = document.createElement('option');
-        option.value = f;
-        option.text = f;
-        if (f === selectedFuel) option.selected = true;
-        fuelSelect.appendChild(option);
-      });
+                    fuelSelect.size = 1;
+                }
 
-      fuelSelect.size = 1;
-    }
+                // --- Populate SUBBASIN DROPDOWN ---
+                const subbasinSelect = document.getElementById('subbasin-filter');
+                if (subbasinSelect) {
+                    subbasinSelect.innerHTML = '';
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All Subbasins';
+                    allOption.selected = selectedSubbasin === 'all';
+                    subbasinSelect.appendChild(allOption);
 
-    // --- Populate SUBBASIN DROPDOWN ---
-    const subbasinSelect = document.getElementById('subbasin-filter');
-    if (subbasinSelect) {
-      subbasinSelect.innerHTML = '';
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.text = 'All Subbasins';
-      allOption.selected = selectedSubbasin === 'all';
-      subbasinSelect.appendChild(allOption);
+                    filteredSubbasins.forEach(sb => {
+                        const option = document.createElement('option');
+                        option.value = sb;
+                        option.text = sb;
+                        if (sb === selectedSubbasin) option.selected = true;
+                        subbasinSelect.appendChild(option);
+                    });
 
-      filteredSubbasins.forEach(sb => {
-        const option = document.createElement('option');
-        option.value = sb;
-        option.text = sb;
-        if (sb === selectedSubbasin) option.selected = true;
-        subbasinSelect.appendChild(option);
-      });
+                    subbasinSelect.size = 1;
+                }
 
-      subbasinSelect.size = 1;
-    }
+                // --- Clear previous layer & markers ---
+                clearPowerLayer();
+                const maxPower = Math.max(...filteredForPlot.map(p => parseFloat(p.total_mwh) || 1));
 
-    // --- Clear previous layer & markers ---
-    clearPowerLayer();
-    const maxPower = Math.max(...filteredForPlot.map(p => parseFloat(p.total_mwh) || 1));
+                // HeatLayer
+                const heatPoints = filteredForPlot.map(p => [
+                    p.lat,
+                    p.lon,
+                    (parseFloat(p.total_mwh) || 0) / maxPower * 0.02
+                ]);
 
-    // HeatLayer
-    const heatPoints = filteredForPlot.map(p => [
-      p.lat,
-      p.lon,
-      (parseFloat(p.total_mwh) || 0) / maxPower * 0.02
-    ]);
-
-    // powerHeatLayer = L.heatLayer(heatPoints, {
-    //   radius: 15,
-    //   blur: 15,
-    //   minOpacity: 0.2,
-    //   gradient: {0.0:'#ffff00', 0.5:'#ff8800', 1.0:'#ff0000'}
-    // }).addTo(map);
+                // powerHeatLayer = L.heatLayer(heatPoints, {
+                //    radius: 15,
+                //    blur: 15,
+                //    minOpacity: 0.2,
+                //    gradient: {0.0:'#ffff00', 0.5:'#ff8800', 1.0:'#ff0000'}
+                // }).addTo(map);
 
     // Pulsating markers
     powerMarkers = [];
@@ -933,139 +979,141 @@ async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", sel
         weight:1
       }).addTo(map);
 
-      marker.bindTooltip(
-        `Power: ${p.total_mwh.toLocaleString()} MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
-        { direction:'top', className:'aqi-tooltip' }
-      );
+                    marker.bindTooltip(
+                        `Power: ${p.total_mwh.toLocaleString()} MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
+                        { direction:'top', className:'aqi-tooltip' }
+                    );
 
-      powerMarkers.push({ marker, baseRadius, intensity });
-    });
+                    powerMarkers.push({ marker, baseRadius, intensity });
+                });
 
-    document.getElementById('footer-timestamp').innerText =
-      `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+                document.getElementById('footer-timestamp').innerText =
+                    `Updated: ${new Date(data.timestamp).toLocaleString()}`;
 
-    setLegend('power');
+                setLegend('power');
 
-  } catch(err) {
-    console.error('Error loading power heatmap:', err);
-  }
-}
-
-
+            } catch(err) {
+                console.error('Error loading power heatmap:', err);
+            }
+        }
 
 
+        async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
+            try {
+                const res = await fetch('https://data-center-map-nu1d.onrender.com/api/carbon');
+                const data = await res.json();
+                let carbonData = data.points || [];
+                if (!carbonData.length) return;
 
-async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
-  try {
-    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/carbon');
-    const data = await res.json();
-    let carbonData = data.points || [];
-    if (!carbonData.length) return;
+                // --- Apply filters for plotting only ---
+                let filteredForPlot = carbonData.slice();
+                if (selectedState !== "all") filteredForPlot = filteredForPlot.filter(p => p.state === selectedState);
+                if (selectedFuel !== "all") filteredForPlot = filteredForPlot.filter(p => p.primary_fuel === selectedFuel);
+                if (selectedSubbasin !== "all") filteredForPlot = filteredForPlot.filter(p => p.subbasin === selectedSubbasin);
 
-    // --- Apply filters for plotting only ---
-    let filteredForPlot = carbonData.slice();
-    if (selectedState !== "all") filteredForPlot = filteredForPlot.filter(p => p.state === selectedState);
-    if (selectedFuel !== "all") filteredForPlot = filteredForPlot.filter(p => p.primary_fuel === selectedFuel);
-    if (selectedSubbasin !== "all") filteredForPlot = filteredForPlot.filter(p => p.subbasin === selectedSubbasin);
+                // --- Compute allowed values for dropdowns based on other selections ---
+                const filteredStates = [...new Set(
+                    carbonData
+                        .filter(p => (selectedFuel === "all" || p.primary_fuel === selectedFuel) &&
+                                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+                        .map(p => p.state).filter(Boolean)
+                )].sort();
 
-    // --- Compute allowed values for dropdowns based on other selections ---
-    const filteredStates = [...new Set(
-      carbonData
-        .filter(p => (selectedFuel === "all" || p.primary_fuel === selectedFuel) &&
-                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
-        .map(p => p.state).filter(Boolean)
-    )].sort();
+                const filteredFuels = [...new Set(
+                    carbonData
+                        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+                        .map(p => p.primary_fuel).filter(Boolean)
+                )].sort();
 
-    const filteredFuels = [...new Set(
-      carbonData
-        .filter(p => (selectedState === "all" || p.state === selectedState) &&
-                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
-        .map(p => p.primary_fuel).filter(Boolean)
-    )].sort();
+                const filteredSubbasins = [...new Set(
+                    carbonData
+                        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                                     (selectedFuel === "all" || p.primary_fuel === selectedFuel))
+                        .map(p => p.subbasin).filter(Boolean)
+                )].sort();
 
-    const filteredSubbasins = [...new Set(
-      carbonData
-        .filter(p => (selectedState === "all" || p.state === selectedState) &&
-                     (selectedFuel === "all" || p.primary_fuel === selectedFuel))
-        .map(p => p.subbasin).filter(Boolean)
-    )].sort();
+                // --- Populate STATE DROPDOWN ---
+                const stateSelect = document.getElementById('state-filter');
+                if (stateSelect) {
+                    stateSelect.innerHTML = '';
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All States';
+                    allOption.selected = selectedState === 'all';
+                    stateSelect.appendChild(allOption);
 
-    // --- Populate STATE DROPDOWN ---
-    const stateSelect = document.getElementById('state-filter');
-    if (stateSelect) {
-      stateSelect.innerHTML = '';
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.text = 'All States';
-      allOption.selected = selectedState === 'all';
-      stateSelect.appendChild(allOption);
+                    filteredStates.forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s;
+                        option.text = s;
+                        if (s === selectedState) option.selected = true;
+                        stateSelect.appendChild(option);
+                    });
+                    stateSelect.size = 1;
+                }
 
-      filteredStates.forEach(s => {
-        const option = document.createElement('option');
-        option.value = s;
-        option.text = s;
-        if (s === selectedState) option.selected = true;
-        stateSelect.appendChild(option);
-      });
-      stateSelect.size = 1;
-    }
+                // --- Populate FUEL DROPDOWN ---
+                const fuelSelect = document.getElementById('fuel-filter');
+                if (fuelSelect) {
+                    fuelSelect.innerHTML = '';
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All Fuels';
+                    allOption.selected = selectedFuel === 'all';
+                    fuelSelect.appendChild(allOption);
 
-    // --- Populate FUEL DROPDOWN ---
-    const fuelSelect = document.getElementById('fuel-filter');
-    if (fuelSelect) {
-      fuelSelect.innerHTML = '';
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.text = 'All Fuels';
-      allOption.selected = selectedFuel === 'all';
-      fuelSelect.appendChild(allOption);
+                    filteredFuels.forEach(f => {
+                        const option = document.createElement('option');
+                        option.value = f;
+                        option.text = f;
+                        if (f === selectedFuel) option.selected = true;
+                        fuelSelect.appendChild(option);
+                    });
+                    fuelSelect.size = 1;
+                }
 
-      filteredFuels.forEach(f => {
-        const option = document.createElement('option');
-        option.value = f;
-        option.text = f;
-        if (f === selectedFuel) option.selected = true;
-        fuelSelect.appendChild(option);
-      });
-      fuelSelect.size = 1;
-    }
+                // --- Populate SUBBASIN DROPDOWN ---
+                const subbasinSelect = document.getElementById('subbasin-filter');
+                if (subbasinSelect) {
+                    subbasinSelect.innerHTML = '';
+                    const allOption = document.createElement('option');
+                    allOption.value = 'all';
+                    allOption.text = 'All Subbasins';
+                    allOption.selected = selectedSubbasin === 'all';
+                    subbasinSelect.appendChild(allOption);
 
-    // --- Populate SUBBASIN DROPDOWN ---
-    const subbasinSelect = document.getElementById('subbasin-filter');
-    if (subbasinSelect) {
-      subbasinSelect.innerHTML = '';
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.text = 'All Subbasins';
-      allOption.selected = selectedSubbasin === 'all';
-      subbasinSelect.appendChild(allOption);
+                    filteredSubbasins.forEach(sb => {
+                        const option = document.createElement('option');
+                        option.value = sb;
+                        option.text = sb;
+                        if (sb === selectedSubbasin) option.selected = true;
+                        subbasinSelect.appendChild(option);
+                    });
+                    subbasinSelect.size = 1;
+                }
 
-      filteredSubbasins.forEach(sb => {
-        const option = document.createElement('option');
-        option.value = sb;
-        option.text = sb;
-        if (sb === selectedSubbasin) option.selected = true;
-        subbasinSelect.appendChild(option);
-      });
-      subbasinSelect.size = 1;
-    }
+                // --- Clear previous heat & markers ---
+                if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+                carbonMarkers.forEach(m => map.removeLayer(m));
+                carbonMarkers = [];
 
-    // --- Clear previous heat & markers ---
-    clearPowerLayer();
-    const maxCarbon = Math.max(...filteredForPlot.map(p => parseFloat(p.carbon_footprint) || 1));
+                if (!filteredForPlot.length) return;
 
-    const heatPoints = filteredForPlot.map(p => {
-      const raw = parseFloat(p.carbon_footprint) || 0;
-      const normalized = Math.min((raw / maxCarbon) * 100, 1);
-      return [p.lat, p.lon, normalized];
-    });
+                const maxCarbon = Math.max(...filteredForPlot.map(p => parseFloat(p.carbon_footprint) || 1));
 
-    // heatLayer = L.heatLayer(heatPoints, {
-    //   radius: 25,
-    //   blur: 30,
-    //   maxZoom: 10,
-    //   gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
-    // }).addTo(map);
+                const heatPoints = filteredForPlot.map(p => {
+                    const raw = parseFloat(p.carbon_footprint) || 0;
+                    const normalized = Math.min((raw / maxCarbon) * 100, 1);
+                    return [p.lat, p.lon, normalized];
+                });
+
+                // heatLayer = L.heatLayer(heatPoints, {
+                //    radius: 25,
+                //    blur: 30,
+                //    maxZoom: 10,
+                //    gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
+                // }).addTo(map);
 
     filteredForPlot.forEach(p => {
       const raw = parseFloat(p.carbon_footprint) || 0;
@@ -1085,692 +1133,958 @@ async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", se
       carbonMarkers.push(marker);
     });
 
-    document.getElementById('footer-timestamp').innerText =
-      `Updated: ${new Date(data.timestamp).toLocaleString()}`;
-
-    setLegend('co2');
-
-  } catch(err) {
-    console.error('Error loading carbon heatmap:', err);
-  }
-}
-
-
-
-// Track currently active layer
-let activeLayer = 'water'; // default
-
-// Helper to get current selected values from all dropdowns
-function getFilterValues() {
-  const stateSelect = document.getElementById('state-filter');
-  const fuelSelect = document.getElementById('fuel-filter');
-  const subbasinSelect = document.getElementById('subbasin-filter');
-
-  return {
-    state: stateSelect ? stateSelect.value : 'all',
-    fuel: fuelSelect ? fuelSelect.value : 'all',
-    subbasin: subbasinSelect ? subbasinSelect.value : 'all'
-  };
-}
-
-// --- Event listeners for all filters ---
-['state-filter', 'fuel-filter', 'subbasin-filter'].forEach(id => {
-  const select = document.getElementById(id);
-  if (select) {
-    select.addEventListener('change', async () => {
-      const { state, fuel, subbasin } = getFilterValues();
-
-      // When state changes, reload heatmap and repopulate dependent dropdowns
-      if (currentLayer === 'water') await loadWaterHeatmap(state, fuel, subbasin);
-      else if (currentLayer === 'power') await loadPowerHeatmap(state, fuel, subbasin);
-      else if (currentLayer === 'co2') await loadCarbonHeatmap(state, fuel, subbasin);
-    });
-  }
-});
-
-
-
-
-// --- Initial Load ---
-// Do not load carbon heatmap automatically
-loadDataCenters();   // always fine
-loadAQIHeatmap();    // initial view is AQI only
-document.getElementById('carbon-projection-modal').style.display = 'none';
-
-
-// --- Monitor layer radio ---
-document.getElementsByName("monitor-layer").forEach(radio=>{
-  radio.addEventListener('change', ()=>{
-    const label = radio.parentElement.textContent.trim();
-    currentPollutant = label.includes("Ozone only")?"ozone":label.includes("PM2.5")?"pm":"all";
-    if(currentLayer==="air") loadAQIHeatmap();
-  });
-});
-
-// --- Nav ribbon (refactored) ---
-const panels = {
-  monitor: document.getElementById('monitor-panel'),
-  insights: document.getElementById('more-insights'),
-};
-  
-const filterIds = ['state-filter', 'fuel-filter', 'subbasin-filter'];
-
-function toggleFiltersForLayer(layer) {
-    const show = ['water','power','co2'].includes(layer.toLowerCase());
-    filterIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = show ? 'block' : 'none';
-    });
-}
-
-function showPanelsFor(layer) {
-    // Toggle main panels
-    panels.monitor.style.display = (layer === "air") ? "flex" : "none";
-    panels.insights.style.display = (layer === "water" || layer === "co2") ? "flex" : "none";
-
-    // Toggle the map info text box
-    const infoBox = document.getElementById('map-info-box');
-    if (infoBox) {
-        infoBox.style.display = (layer === "air") ? "block" : "none";
-    }
-
-    // Remove old projection tabs if they exist
-    const projectionTabIds = [
-        'water-projection-tab',
-        'water-vs-carbon-tab',
-        'carbon-projection-tab'
-    ];
-
-    projectionTabIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.remove();
-    });
-
-    // Add relevant projection tabs
-    if (layer === "water") {
-        addWaterProjectionTab();
-        addWaterVsCarbonTab(); // NEW
-    }
-    if (layer === "co2") {
-        addCarbonProjectionTab();
-    }
-
-    // --- Toggle filters for this layer ---
-    toggleFiltersForLayer(layer);
-}
-
-
-
-
-
-function clearWaterLayer() {
-  // Remove heatmap
-  if (waterHeatLayer) {
-    map.removeLayer(waterHeatLayer);
-    waterHeatLayer = null;
-  }
-
-  // Remove markers
-  if (waterMarkers && waterMarkers.length > 0) {
-    waterMarkers.forEach(obj => map.removeLayer(obj.circle));
-    waterMarkers = [];
-  }
-
-  // Clear animation
-  if (waterPulseInterval) {
-    clearInterval(waterPulseInterval);
-    waterPulseInterval = null;
-  }
-}
-
-function clearPowerLayer() {
-  if(powerHeatLayer) {
-    map.removeLayer(powerHeatLayer);
-    powerHeatLayer = null;
-  }
-  if(powerMarkers && powerMarkers.length > 0){
-    powerMarkers.forEach(obj => map.removeLayer(obj.marker));
-    powerMarkers = [];
-  }
-  if(powerPulseInterval){
-    clearInterval(powerPulseInterval);
-    powerPulseInterval = null;
-  }
-}
-
-function addWaterProjectionTab() {
-    // Remove existing tab if already present
-    const existingTab = document.getElementById('water-projection-tab');
-    if(existingTab) existingTab.remove();
-
-    const tab = document.createElement('div');
-    tab.id = 'water-projection-tab';
-    tab.className = 'insight-item';
-    tab.innerHTML = '<i class="fas fa-water" style="color:#3B82F6;"></i> Water Projections';
-    tab.style.cursor = 'pointer';
-
-    tab.addEventListener('click', () => {
-        document.getElementById('water-projection-modal').style.display = 'flex';
-        loadWaterProjectionChart();
-    });
-
-    document.getElementById('more-insights').appendChild(tab);
-}
-
-// --- NEW: Water vs Carbon Chart ---
-function addWaterVsCarbonTab() {
-    const existingTab = document.getElementById('water-vs-carbon-tab');
-    if(existingTab) existingTab.remove();
-
-    const tab = document.createElement('div');
-    tab.id = 'water-vs-carbon-tab';
-    tab.className = 'insight-item';
-    tab.innerHTML = '<i class="fas fa-chart-line" style="color:#22C55E;"></i> Water vs Carbon Chart';
-    tab.style.cursor = 'pointer';
-
-    tab.addEventListener('click', () => {
-    const panel = document.getElementById('insight-graph-panel');
-    panel.style.display = 'flex';
-    document.getElementById('graph-title').innerText = 'Water vs Power Tradeoff';
-    loadWaterBubbleChart();
-});
-
-
-    // Insert after Water Projection tab
-    const waterTab = document.getElementById('water-projection-tab');
-    if(waterTab) waterTab.insertAdjacentElement('afterend', tab);
-    else document.getElementById('more-insights').appendChild(tab);
-}
-
-function addCarbonProjectionTab() {
-    // Remove existing tab if already present
-    const existingTab = document.getElementById('carbon-projection-tab');
-    if(existingTab) existingTab.remove();
-
-    const tab = document.createElement('div');
-    tab.id = 'carbon-projection-tab';
-    tab.className = 'insight-item';
-    tab.innerHTML = '<i class="fas fa-cloud" style="color:red;"></i> Carbon Projections';
-    tab.style.cursor = 'pointer';
-
-    tab.addEventListener('click', () => {
-    const modal = document.getElementById('carbon-projection-modal');
-    modal.style.display = 'flex';
-
-    // Give the browser a tick to apply layout before drawing chart
-    setTimeout(() => loadCarbonProjectionChart(), 50);
-    });
-
-
-    document.getElementById('more-insights').appendChild(tab);
-}
-
-
-function clearHeatLayer() {
-  if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
-
-  // Clear water
-  clearWaterLayer();
-
-  // Clear carbon markers
-  if (carbonMarkers && carbonMarkers.length > 0) {
-    carbonMarkers.forEach(m => map.removeLayer(m));
-    carbonMarkers = [];
-  }
-
-  // Clear AQI markers
-  if (aqiMarkers.length > 0) {
-    aqiMarkers.forEach(m => map.removeLayer(m));
-    aqiMarkers = [];
-  }
-
-  // Clear power markers & heatmap
-  clearPowerLayer();
-
-  document.getElementById('footer-timestamp').innerText = "Data layer not implemented yet";
-  setLegend(""); // clear legend
-}
-
-
-let carbonLoaded = false; // existing at top of script
-let powerLoaded = false;  // new flag for power layer
-
-function loadLayer(layer) {
-  switch (layer) {
-    case "water":
-      loadWaterHeatmap();
-      break;
-    case "air":
-      loadAQIHeatmap();
-      break;
-    case "co2":
-      loadCarbonHeatmap(); // fetch runs every time
-      break;
-    case "power":
-      loadPowerHeatmap();  // fetch power data
-      break;
-    default:
-      clearHeatLayer();
-      break;
-  }
-}
-
-
-
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', () => {
-    // Highlight active item
-    document.querySelector('.nav-item.active')?.classList.remove('active');
-    item.classList.add('active');
-
-    const layer = item.dataset.layer;
-    currentLayer = layer;
-
-    showPanelsFor(layer);
-
-    // Clear previous heatmap & markers before loading new layer
-    clearHeatLayer();
-
-    loadLayer(layer);
-  });
-});
-
-// --- More Insights click ---
-document.querySelectorAll('#more-insights .insight-item').forEach(item => {
-    item.addEventListener('click', () => {
-        if (currentLayer !== "water" && currentLayer !== "co2") return;  // allow CO2 too
-        const panel = document.getElementById('insight-graph-panel');
-        panel.style.display = 'flex';
-
-        // Pass the layer type so loadFuelTypeGraph knows which API to call
-        loadFuelTypeGraph(currentLayer);
-    });
-});
-
-
-// --- Close Graph Panel ---
-document.getElementById('close-graph-panel').addEventListener('click',()=>{
-  document.getElementById('insight-graph-panel').style.display='none';
-});
-
-// Close Water Projections Modal
-document.getElementById('close-water-projection').addEventListener('click', () => {
-    document.getElementById('water-projection-modal').style.display = 'none';
-});
-
-// Close Carbon Projections Modal
-document.getElementById('close-carbon-projection').addEventListener('click', () => {
-    document.getElementById('carbon-projection-modal').style.display = 'none';
-});
-
-
-// --- DC Info Tab toggle ---
-const dcTab = document.getElementById('dc-info-tab');
-dcTab.addEventListener('click',()=>{
-  if(dcTab.style.display==='none'||dcTab.style.display==='') dcTab.style.display='flex';
-  dcTab.classList.toggle('large');
-});
-document.getElementById('close-dc-tab').addEventListener('click',e=>{
-  e.stopPropagation();
-  dcTab.classList.remove('large');
-  dcTab.style.display='none';
-});
-
-async function loadFuelTypeGraph(layerType = "water") {
-    try {
-        // Decide which API to call based on layer
-        const apiUrl = layerType === "co2"
-            ? 'https://data-center-map-nu1d.onrender.com/api/carbon_fuel'
-            : 'https://data-center-map-nu1d.onrender.com/api/water_fuel';
-
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-
-        const fuelMap = {};
-        data.forEach(row => {
-            const fuel = row.primary_fuel || 'Unknown';
-            const value = layerType === "co2"
-                ? parseFloat(row.carbon_footprint) || 0
-                : parseFloat(row.water_footprint) || 0;
-
-            if (!fuelMap[fuel]) fuelMap[fuel] = 0;
-            fuelMap[fuel] += value;
+                document.getElementById('footer-timestamp').innerText =
+                    `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+
+                setLegend('co2');
+
+            } catch(err) {
+                console.error('Error loading carbon heatmap:', err);
+            }
+        }
+
+
+        // Track currently active layer
+        let activeLayer = 'water'; // default
+
+        // Helper to get current selected values from all dropdowns
+        function getFilterValues() {
+            const stateSelect = document.getElementById('state-filter');
+            const fuelSelect = document.getElementById('fuel-filter');
+            const subbasinSelect = document.getElementById('subbasin-filter');
+
+            return {
+                state: stateSelect ? stateSelect.value : 'all',
+                fuel: fuelSelect ? fuelSelect.value : 'all',
+                subbasin: subbasinSelect ? subbasinSelect.value : 'all'
+            };
+        }
+
+        // --- Event listeners for all filters ---
+        ['state-filter', 'fuel-filter', 'subbasin-filter'].forEach(id => {
+            const select = document.getElementById(id);
+            if (select) {
+                select.addEventListener('change', async () => {
+                    const { state, fuel, subbasin } = getFilterValues();
+
+                    // When state changes, reload heatmap and repopulate dependent dropdowns
+                    if (currentLayer === 'water') await loadWaterHeatmap(state, fuel, subbasin);
+                    else if (currentLayer === 'power') await loadPowerHeatmap(state, fuel, subbasin);
+                    else if (currentLayer === 'co2') await loadCarbonHeatmap(state, fuel, subbasin);
+                });
+            }
         });
 
-        const labels = Object.keys(fuelMap);
-        const values = Object.values(fuelMap);
+        async function loadDataCenterSummary() {
+            // 1. Hide all map-related panels and filters
+            hideMapControls();
 
-        const placeholder = document.getElementById('graph-placeholder');
-        document.getElementById('graph-title').innerText = 'Fuel Type Analysis';
-        placeholder.innerHTML = '<canvas id="fuel-chart"></canvas>';
+            // 2. FIX: ONLY MAKE THE OVERLAY VISIBLE. DO NOT RESET innerHTML.
+            // This preserves the permanent canvas elements in the DOM.
+            const summaryOverlay = document.getElementById('summary-overlay');
+            if (summaryOverlay) {
+                summaryOverlay.style.display = 'block';
+            }
 
-        const ctx = document.getElementById('fuel-chart').getContext('2d');
+            // 3. Destroy previous chart instances
+            if (window.plotStatusChart) window.plotStatusChart.destroy();
+            if (window.plotStatesChart) window.plotStatesChart.destroy();
+            if (window.plotOperatorsChart) window.plotOperatorsChart.destroy();
+            if (window.plotSizeChart) window.plotSizeChart.destroy();
 
-        if (window.fuelChart) window.fuelChart.destroy();
+            try {
+                const res = await fetch('https://data-center-map-nu1d.onrender.com/api/data_center_summary');
+                const data = await res.json();
 
-        window.fuelChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: layerType === "co2" ? 'Carbon Footprint (kg CO₂)' : 'Water Footprint (m³)',
-                    data: values,
-                    backgroundColor: ['#FF0000','#FF8800','#FFFF00','#22C55E','#06B6D4','#3B82F6'],
-                    borderColor: '#fff',
-                    borderWidth: 1,
-                    borderRadius: 6,
-                    hoverBackgroundColor: ['#FF5555','#FFAA55','#FFFF88','#4ADE80','#22D3EE','#60A5FA'],
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#111827',
-                        titleColor: '#6EC1E4',
-                        bodyColor: '#fff',
-                        titleFont: { weight: '600' }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { color: '#fff', callback: val => val >= 1e6 ? (val/1e6).toFixed(1)+'M' : val },
-                        title: { display: true, text: layerType === "co2" ? 'Carbon (kg CO₂)' : 'Water (m³)', color:'#fff' }
-                    },
-                    x: { ticks: { color: '#fff' } }
+                // ----------------------------------------------------
+                // 🌟 ENHANCEMENT: Implement robust data validation 🌟
+                // ----------------------------------------------------
+                const status_counts = Array.isArray(data.status_counts) ? data.status_counts : [];
+                const top_states = Array.isArray(data.top_states) ? data.top_states : [];
+                const top_operators = Array.isArray(data.top_operators) ? data.top_operators : [];
+                const size_distribution = Array.isArray(data.size_distribution) ? data.size_distribution : [];
+
+                // --- Plot 1: Project Status Donut (FIXED STRETCHING) ---
+                if (status_counts.length > 0) {
+                    window.plotStatusChart = new Chart(document.getElementById('plot-status').getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: status_counts.map(d => d.Count),
+                            datasets: [{
+                                data: status_counts.map(d => d.count),
+                                backgroundColor: ['#4daf4a','#377eb8','#ff7f00','#984ea3','#e41a1c', '#f781bf']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false, // <-- Necessary to prevent horizontal stretching
+                            aspectRatio: 1,           // <-- FIX: Forces the chart area to be a square (1:1)
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: '#fff' } },
+                                title: { display:true, text:'Project Status', color: '#fff' }
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById('plot-status').parentElement.innerHTML = '<div class="grid-box" style="color:#ccc; text-align:center;">No Status data available.</div>';
                 }
-            }
-        });
-    } catch (err) {
-        console.error('Error loading fuel type graph', err);
-        document.getElementById('graph-placeholder').innerHTML =
-            '<div style="color:#ccc; text-align:center;">Failed to load chart.</div>';
-    }
-}
 
-
-async function loadWaterProjectionChart() {
-    try {
-        const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water_scenario');
-        const data = await res.json();
-        const points = data.points;
-        console.log("Water Scenario API returned:", data);
-
-        // --- Group points by year ---
-        const yearMap = {};
-        points.forEach(p => {
-            const year = p.year;
-            if (!yearMap[year]) yearMap[year] = { best: null, worst: null };
-            if (p.scenario.toLowerCase().includes("best")) yearMap[year].best = p.water_Mm3;
-            if (p.scenario.toLowerCase().includes("worst")) yearMap[year].worst = p.water_Mm3;
-        });
-
-        // Sort years
-        const years = Object.keys(yearMap).sort((a, b) => a - b);
-
-        // Create series arrays
-        const bestSeries = years.map(y => yearMap[y].best ?? 0);
-        const worstSeries = years.map(y => yearMap[y].worst ?? 0);
-
-        // --- Render Chart.js line chart ---
-        const ctx = document.getElementById('waterProjectionChart').getContext('2d');
-
-        // Only destroy if it’s a Chart.js instance
-        if (window.waterProjectionChart && window.waterProjectionChart instanceof Chart) {
-            window.waterProjectionChart.destroy();
-        }
-
-
-        window.waterProjectionChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: years,
-                datasets: [
-                    {
-                        label: 'Best Water Projection',
-                        data: bestSeries,
-                        borderColor: 'green',
-                        fill: false,
-                        tension: 0.3
-                    },
-                    {
-                        label: 'Worst Water Projection',
-                        data: worstSeries,
-                        borderColor: 'red',
-                        fill: false,
-                        tension: 0.3
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { labels: { color: '#fff' } },
-                    tooltip: {
-                        backgroundColor: '#111827',
-                        titleColor: '#6EC1E4',
-                        bodyColor: '#fff',
-                        titleFont: { weight: '600' }
-                    }
-                },
-                scales: {
-                    x: { ticks: { color: '#fff' } },
-                    y: {
-                        ticks: { color: '#fff' },
-                        title: { display: true, text: 'Water (Mm³)', color: '#fff' }
-                    }
+                // --- Plot 2: Top States Horizontal Bar (MAINTAIN ASPECT RATIO SET) ---
+                if (top_states.length > 0) {
+                    window.plotStatesChart = new Chart(document.getElementById('plot-states').getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: top_states.map(d => d.Count),
+                            datasets: [{
+                                label: 'Facilities',
+                                data: top_states.map(d => d.count),
+                                backgroundColor: '#377eb8'
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false, // <-- ENSURE this is set here
+                            plugins: { legend: { display: false }, title: { display:true, text:'Top States', color: '#fff' } },
+                            scales: { x: { ticks: { color: '#fff' } }, y: { ticks: { color: '#fff' } } }
+                        }
+                    });
+                } else {
+                    document.getElementById('plot-states').parentElement.innerHTML = '<div class="grid-box" style="color:#ccc; text-align:center;">No States data available.</div>';
                 }
+
+                // --- Plot 3: Top Operators Lollipop (MAINTAIN ASPECT RATIO SET) ---
+                if (top_operators.length > 0) {
+                    // Extract data once
+                    const counts = top_operators.map(d => d.count);
+                    const labels = top_operators.map(d => d.Count);
+
+                    window.plotOperatorsChart = new Chart(document.getElementById('plot-operators').getContext('2d'), {
+                        // We use 'bar' as the base type for the vertical category axis (y-axis)
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                // Dataset 1: The Stick (Thin Bar)
+                                label: 'Facilities',
+                                data: counts,
+                                backgroundColor: 'rgba(255, 127, 14, 0.2)', // Faint color for the stick
+                                borderColor: 'transparent',
+                                borderWidth: 0,
+                                barPercentage: 0.2, // Make the stick thin (adjust this value to change thinness)
+                                categoryPercentage: 0.8,
+                                borderRadius: 0,
+                            }, {
+                                // Dataset 2: The Ball (Scatter/Dot placed at the end of the stick)
+                                label: 'Marker',
+                                data: counts,
+                                type: 'scatter', // Overlay a scatter plot for the dots
+                                pointRadius: 7, // Size of the ball
+                                pointBackgroundColor: '#ff7f0e', // Ball color
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointStyle: 'circle',
+                                order: 0, // Ensure the ball is drawn on top of the stick
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            layout: {
+                                padding: { right: 10 } // Add padding to ensure the ball fits on the right edge
+                            },
+                            plugins: {
+                                legend: { display:false },
+                                title: { display:true, text:'Top 10 Operators (Lollipop)', color: '#fff' }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: { color: '#fff' }
+                                },
+                                y: {
+                                    ticks: { color: '#fff' }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById('plot-operators').parentElement.innerHTML = '<div class="grid-box" style="color:#ccc; text-align:center;">No Operators data available.</div>';
+                }
+
+                // --- Plot 4: Facility Size Distribution (Density Curve Plot) ---
+                if (size_distribution.length > 0) {
+                    // 1. Extract ALL size data (raw values)
+                    const rawSizeData = size_distribution
+                        .map(d => parseFloat(d.Size_Million_sq_ft))
+                        .filter(n => !isNaN(n) && n > 0);
+
+                    if (rawSizeData.length > 0) {
+                        // --- Step 1: Create Bins and Normalized Frequency Data Points ---
+                        const totalCount = rawSizeData.length;
+                        const minSize = Math.min(...rawSizeData);
+                        const maxSize = Math.max(...rawSizeData);
+                        const numBins = 15;
+                        const binWidth = (maxSize - minSize) / numBins;
+
+                        const bins = Array(numBins).fill(0);
+                        const curvePoints = [];
+
+                        rawSizeData.forEach(size => {
+                            let binIndex = Math.floor((size - minSize) / binWidth);
+                            if (binIndex >= numBins) binIndex = numBins - 1;
+                            bins[binIndex]++;
+                        });
+
+                        for (let i = 0; i < numBins; i++) {
+                            const center = minSize + (i + 0.5) * binWidth;
+                            const normalizedFrequency = bins[i] / totalCount;
+                            curvePoints.push({ x: center, y: normalizedFrequency });
+                        }
+
+                        // --- Step 2: Chart Configuration ---
+                        if (window.plotSizeChart) window.plotSizeChart.destroy();
+
+                        window.plotSizeChart = new Chart(document.getElementById('plot-size').getContext('2d'), {
+                            type: 'line',
+                            data: {
+                                datasets: [
+                                    {
+                                        label: 'Distribution Density',
+                                        data: curvePoints,
+                                        type: 'line',
+                                        xAxisID: 'x-linear',
+                                        yAxisID: 'density-axis',
+                                        borderColor: '#6EC1E4',
+                                        backgroundColor: 'rgba(110, 193, 228, 0.4)',
+                                        borderWidth: 3,
+                                        fill: true,
+                                        tension: 0.4,
+                                        pointRadius: 0,
+                                        showLine: true
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+
+                                // 🌟 FIX 🌟: Add Interaction and Tooltip Configuration
+                                interaction: {
+                                    mode: 'nearest', // Trigger tooltip when hovering nearest data point
+                                    intersect: false, // Allows the tooltip to trigger even if not directly over the point
+                                    axis: 'x' // Restrict interaction along the X-axis for smoother hover
+                                },
+                                plugins: {
+                                    legend: { display: false },
+                                    title: { display: true, text: 'Facility Size Density Distribution', color: '#fff' },
+                                    tooltip: {
+                                        callbacks: {
+                                            title: function(context) {
+                                                // Display the X-value (Size) as the title
+                                                return `Size: ${context[0].parsed.x.toFixed(2)} Million sq ft`;
+                                            },
+                                            label: function(context) {
+                                                // Display the Y-value (Density) as the label
+                                                return `Density: ${context.parsed.y.toFixed(3)}`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    'x-linear': {
+                                        type: 'linear',
+                                        position: 'bottom',
+                                        title: { display: true, text: 'Size (Million sq ft)', color: '#fff' },
+                                        min: minSize,
+                                        max: maxSize,
+                                        ticks: { color: '#fff' }
+                                    },
+                                    'density-axis': {
+                                        type: 'linear',
+                                        position: 'left', // Switched to 'left' for better primary focus
+                                        beginAtZero: true,
+                                        max: Math.max(...curvePoints.map(p => p.y)) * 1.2 || 1.0,
+                                        title: { display: true, text: 'Normalized Density', color: '#6EC1E4' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                        ticks: { color: '#6EC1E4' }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        document.getElementById('plot-size').parentElement.innerHTML = '<div class="grid-box" style="color:#ccc; text-align:center;">No valid Size data available for plotting.</div>';
+                    }
+                } else {
+                    document.getElementById('plot-size').parentElement.innerHTML = '<div class="grid-box" style="color:#ccc; text-align:center;">No Size data available.</div>';
+                }
+
+                console.log("Data Center Summary loaded.");
+            } catch(e) {
+                console.error("Failed to fetch data center summary:", e);
+                // This fallback catches API server issues (HTTP 500, fetch error)
+                document.getElementById('summary-overlay').innerHTML = '<div style="color:#FF6B6B; text-align:center; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:1.5rem; background:rgba(0,0,0,0.8); padding:20px; border-radius:10px;">Failed to load data center summary data. Check API service endpoint (http://127.0.0.1:3000/api/data_center_summary).</div>';
             }
-        });
-
-    } catch (err) {
-        console.error('Error loading water projection chart', err);
-    }
-}
-
-async function loadCarbonProjectionChart() {
-    try {
-        const res = await fetch('https://data-center-map-nu1d.onrender.com/api/carbon_scenario');
-        const apiResponse = await res.json(); // 1. Renamed 'data' to 'apiResponse' for clarity
-        console.log("Carbon Scenario API returned:", apiResponse); // Check this log!
-        const points = apiResponse.data;
-
-        // --- FIX: Add a guard clause here ---
-        if (!points || !Array.isArray(points) || points.length === 0) {
-            console.error("Carbon data is missing or not an array:", data);
-            // Optional: Display a message in the modal instead of a chart
-            const chartContainer = document.getElementById('carbonProjectionChart').parentElement;
-            chartContainer.innerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; color:#ccc;">No Carbon Projection data available.</div>';
-            return; // Stop execution if data is bad or missing
         }
 
-        // --- Group points by year ---
-        const yearMap = {};
-        points.forEach(p => {
-            const year = p.year;
-            if (!yearMap[year]) yearMap[year] = { best: null, worst: null };
-            if (p.scenario.toLowerCase().includes("best")) yearMap[year].best = p.carbon_MtCO2;
-            if (p.scenario.toLowerCase().includes("worst")) yearMap[year].worst = p.carbon_MtCO2;
+
+        // --- Initial Load ---
+        // Do not load carbon heatmap automatically
+        loadDataCenters();  // always fine
+        loadAQIHeatmap();    // initial view is AQI only
+        document.getElementById('carbon-projection-modal').style.display = 'none';
+
+
+        // --- Monitor layer radio ---
+        document.getElementsByName("monitor-layer").forEach(radio=>{
+            radio.addEventListener('change', ()=>{
+                const label = radio.parentElement.textContent.trim();
+                currentPollutant = label.includes("Ozone only")?"ozone":label.includes("PM2.5")?"pm":"all";
+                if(currentLayer==="air") loadAQIHeatmap();
+            });
         });
 
-        // Sort years
-        const years = Object.keys(yearMap).sort((a,b)=>a-b);
+        // --- Nav ribbon (refactored) ---
+        const panels = {
+            monitor: document.getElementById('monitor-panel'),
+            insights: document.getElementById('more-insights'),
+        };
 
-        // Create series arrays
-        const bestSeries = years.map(y => yearMap[y].best ?? 0);
-        const worstSeries = years.map(y => yearMap[y].worst ?? 0);
+        const filterIds = ['state-filter', 'fuel-filter', 'subbasin-filter'];
 
-        // --- Render Chart.js line chart ---
-        const ctx = document.getElementById('carbonProjectionChart').getContext('2d');
-
-        // Only destroy if it’s a Chart.js instance
-        if (window.carbonProjectionChart && window.carbonProjectionChart instanceof Chart) {
-            window.carbonProjectionChart.destroy();
+        function toggleFiltersForLayer(layer) {
+            const show = ['water','power','co2'].includes(layer.toLowerCase());
+            filterIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = show ? 'block' : 'none';
+            });
         }
 
-        window.carbonProjectionChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: years,
-                datasets: [
-                    {
-                        label: 'Best Carbon Projection',
-                        data: bestSeries,
-                        borderColor: 'green',
-                        fill: false,
-                        tension: 0.3
+        function showPanelsFor(layer) {
+            // Toggle main panels
+            panels.monitor.style.display = (layer === "air") ? "flex" : "none";
+            panels.insights.style.display = (layer === "water" || layer === "co2") ? "flex" : "none";
+
+            // Toggle the map info text box
+            const infoBox = document.getElementById('map-info-box');
+            if (infoBox) {
+                infoBox.style.display = (layer === "air") ? "block" : "none";
+            }
+
+            // Remove old projection tabs if they exist
+            const projectionTabIds = [
+                'water-projection-tab',
+                'water-vs-carbon-tab',
+                'carbon-projection-tab'
+            ];
+
+            projectionTabIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.remove();
+            });
+
+            // Add relevant projection tabs
+            if (layer === "water") {
+                addWaterProjectionTab();
+                addWaterVsCarbonTab(); // NEW
+            }
+            if (layer === "co2") {
+                addCarbonProjectionTab();
+            }
+
+            // --- Toggle filters for this layer ---
+            toggleFiltersForLayer(layer);
+        }
+
+
+        function clearWaterLayer() {
+            // Remove heatmap
+            if (waterHeatLayer) {
+                map.removeLayer(waterHeatLayer);
+                waterHeatLayer = null;
+            }
+
+            // Remove markers
+            if (waterMarkers && waterMarkers.length > 0) {
+                waterMarkers.forEach(obj => map.removeLayer(obj.circle));
+                waterMarkers = [];
+            }
+
+            // Clear animation
+            if (waterPulseInterval) {
+                clearInterval(waterPulseInterval);
+                waterPulseInterval = null;
+            }
+        }
+
+        function clearPowerLayer() {
+            if(powerHeatLayer) {
+                map.removeLayer(powerHeatLayer);
+                powerHeatLayer = null;
+            }
+            if(powerMarkers && powerMarkers.length > 0){
+                powerMarkers.forEach(obj => map.removeLayer(obj.marker));
+                powerMarkers = [];
+            }
+            if(powerPulseInterval){
+                clearInterval(powerPulseInterval);
+                powerPulseInterval = null;
+            }
+        }
+
+        function addWaterProjectionTab() {
+            // Remove existing tab if already present
+            const existingTab = document.getElementById('water-projection-tab');
+            if(existingTab) existingTab.remove();
+
+            const tab = document.createElement('div');
+            tab.id = 'water-projection-tab';
+            tab.className = 'insight-item';
+            tab.innerHTML = '<i class="fas fa-water" style="color:#3B82F6;"></i> Water Projections';
+            tab.style.cursor = 'pointer';
+
+            tab.addEventListener('click', () => {
+                document.getElementById('water-projection-modal').style.display = 'flex';
+                loadWaterProjectionChart();
+            });
+
+            document.getElementById('more-insights').appendChild(tab);
+        }
+
+        // --- NEW: Water vs Carbon Chart ---
+        function addWaterVsCarbonTab() {
+            const existingTab = document.getElementById('water-vs-carbon-tab');
+            if(existingTab) existingTab.remove();
+
+            const tab = document.createElement('div');
+            tab.id = 'water-vs-carbon-tab';
+            tab.className = 'insight-item';
+            tab.innerHTML = '<i class="fas fa-chart-line" style="color:#22C55E;"></i> Water vs Carbon Chart';
+            tab.style.cursor = 'pointer';
+
+            tab.addEventListener('click', () => {
+                const panel = document.getElementById('insight-graph-panel');
+                panel.style.display = 'flex';
+                document.getElementById('graph-title').innerText = 'Water vs Power Tradeoff';
+                loadWaterBubbleChart();
+            });
+
+
+            // Insert after Water Projection tab
+            const waterTab = document.getElementById('water-projection-tab');
+            if(waterTab) waterTab.insertAdjacentElement('afterend', tab);
+            else document.getElementById('more-insights').appendChild(tab);
+        }
+
+        function addCarbonProjectionTab() {
+            // Remove existing tab if already present
+            const existingTab = document.getElementById('carbon-projection-tab');
+            if(existingTab) existingTab.remove();
+
+            const tab = document.createElement('div');
+            tab.id = 'carbon-projection-tab';
+            tab.className = 'insight-item';
+            tab.innerHTML = '<i class="fas fa-cloud" style="color:red;"></i> Carbon Projections';
+            tab.style.cursor = 'pointer';
+
+            tab.addEventListener('click', () => {
+                const modal = document.getElementById('carbon-projection-modal');
+                modal.style.display = 'flex';
+
+                // Give the browser a tick to apply layout before drawing chart
+                setTimeout(() => loadCarbonProjectionChart(), 50);
+            });
+
+
+            document.getElementById('more-insights').appendChild(tab);
+        }
+
+
+        function clearHeatLayer() {
+            if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+
+            // Clear water
+            clearWaterLayer();
+
+            // Clear carbon markers
+            if (carbonMarkers && carbonMarkers.length > 0) {
+                carbonMarkers.forEach(m => map.removeLayer(m));
+                carbonMarkers = [];
+            }
+
+            // Clear AQI markers
+            if (aqiMarkers.length > 0) {
+                aqiMarkers.forEach(m => map.removeLayer(m));
+                aqiMarkers = [];
+            }
+
+            // Clear power markers & heatmap
+            clearPowerLayer();
+
+            document.getElementById('footer-timestamp').innerText = "Data layer not implemented yet";
+            setLegend(""); // clear legend
+        }
+
+
+        let carbonLoaded = false; // existing at top of script
+        let powerLoaded = false;  // new flag for power layer
+
+        function removeSummaryOverlay() {
+            const overlay = document.getElementById("summary-overlay");
+            if (overlay) overlay.remove();
+        }
+        // ---- Layer Switcher ----
+        function loadLayer(layer) {
+            // Clear map layers (dc markers, heatmaps, etc.)
+            clearHeatLayer();
+
+            // Hide the summary overlay if switching to a map layer
+            if (layer !== "summary") {
+                document.getElementById('summary-overlay').style.display = 'none';
+                showMapControls(); // NEW helper needed for non-summary layers
+            }
+
+            switch (layer) {
+                case "water": loadWaterHeatmap(); break;
+                case "air": loadAQIHeatmap(); break;
+                case "co2": loadCarbonHeatmap(); break;
+                case "power": loadPowerHeatmap(); break;
+                case "summary": loadDataCenterSummary(); break;
+                default: clearHeatLayer(); break;
+            }
+        }
+
+        function hideMapControls() {
+            document.getElementById('monitor-panel').style.display = 'none';
+            document.getElementById('more-insights').style.display = 'none';
+            document.getElementById('map-info-box').style.display = 'none';
+            document.getElementById('state-filter').style.display = 'none';
+            document.getElementById('fuel-filter').style.display = 'none';
+            document.getElementById('subbasin-filter').style.display = 'none';
+            document.getElementById('dc-info-tab').style.display = 'none';
+        }
+
+        function showMapControls() {
+            // The filters visibility is now controlled *only* by showPanelsFor / toggleFiltersForLayer
+            // This function is intentionally left empty to fix the bug where filters reappear on the 'air' layer.
+        }
+
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // Highlight active item
+                document.querySelector('.nav-item.active')?.classList.remove('active');
+                item.classList.add('active');
+
+                const layer = item.dataset.layer;
+                currentLayer = layer;
+
+                showPanelsFor(layer);
+
+                // Clear previous heatmap & markers before loading new layer
+                clearHeatLayer();
+
+                loadLayer(layer);
+            });
+        });
+
+        // --- More Insights click ---
+        document.querySelectorAll('#more-insights .insight-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (currentLayer !== "water" && currentLayer !== "co2") return;  // allow CO2 too
+                const panel = document.getElementById('insight-graph-panel');
+                panel.style.display = 'flex';
+
+                // Pass the layer type so loadFuelTypeGraph knows which API to call
+                loadFuelTypeGraph(currentLayer);
+            });
+        });
+
+
+        // --- Close Graph Panel ---
+        document.getElementById('close-graph-panel').addEventListener('click',()=>{
+            document.getElementById('insight-graph-panel').style.display='none';
+        });
+
+        // Close Water Projections Modal
+        document.getElementById('close-water-projection').addEventListener('click', () => {
+            document.getElementById('water-projection-modal').style.display = 'none';
+        });
+
+        // Close Carbon Projections Modal
+        document.getElementById('close-carbon-projection').addEventListener('click', () => {
+            document.getElementById('carbon-projection-modal').style.display = 'none';
+        });
+
+
+        // --- DC Info Tab toggle ---
+        const dcTab = document.getElementById('dc-info-tab');
+        dcTab.addEventListener('click',()=>{
+            if(dcTab.style.display==='none'||dcTab.style.display==='') dcTab.style.display='flex';
+            dcTab.classList.toggle('large');
+        });
+        document.getElementById('close-dc-tab').addEventListener('click',e=>{
+            e.stopPropagation();
+            dcTab.classList.remove('large');
+            dcTab.style.display='none';
+        });
+
+        async function loadFuelTypeGraph(layerType = "water") {
+            try {
+                // Decide which API to call based on layer
+                const apiUrl = layerType === "co2"
+                    ? 'https://data-center-map-nu1d.onrender.com/api/carbon_fuel'
+                    : 'https://data-center-map-nu1d.onrender.com/api/water_fuel';
+
+                const res = await fetch(apiUrl);
+                const data = await res.json();
+
+                const fuelMap = {};
+                data.forEach(row => {
+                    const fuel = row.primary_fuel || 'Unknown';
+                    const value = layerType === "co2"
+                        ? parseFloat(row.carbon_footprint) || 0
+                        : parseFloat(row.water_footprint) || 0;
+
+                    if (!fuelMap[fuel]) fuelMap[fuel] = 0;
+                    fuelMap[fuel] += value;
+                });
+
+                const labels = Object.keys(fuelMap);
+                const values = Object.values(fuelMap);
+
+                const placeholder = document.getElementById('graph-placeholder');
+                document.getElementById('graph-title').innerText = 'Fuel Type Analysis';
+                placeholder.innerHTML = '<canvas id="fuel-chart"></canvas>';
+
+                const ctx = document.getElementById('fuel-chart').getContext('2d');
+
+                if (window.fuelChart) window.fuelChart.destroy();
+
+                window.fuelChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: layerType === "co2" ? 'Carbon Footprint (kg CO₂)' : 'Water Footprint (m³)',
+                            data: values,
+                            backgroundColor: ['#FF0000','#FF8800','#FFFF00','#22C55E','#06B6D4','#3B82F6'],
+                            borderColor: '#fff',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            hoverBackgroundColor: ['#FF5555','#FFAA55','#FFFF88','#4ADE80','#22D3EE','#60A5FA'],
+                        }]
                     },
-                    {
-                        label: 'Worst Carbon Projection',
-                        data: worstSeries,
-                        borderColor: 'red',
-                        fill: false,
-                        tension: 0.3
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#111827',
+                                titleColor: '#6EC1E4',
+                                bodyColor: '#fff',
+                                titleFont: { weight: '600' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: '#fff', callback: val => val >= 1e6 ? (val/1e6).toFixed(1)+'M' : val },
+                                title: { display: true, text: layerType === "co2" ? 'Carbon (kg CO₂)' : 'Water (m³)', color:'#fff' }
+                            },
+                            x: { ticks: { color: '#fff' } }
+                        }
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,  // important for modal
-                plugins: {
-                    legend: { labels: { color: '#fff' } },
-                    tooltip: {
-                        backgroundColor: '#111827',
-                        titleColor: '#6EC1E4',
-                        bodyColor: '#fff',
-                        titleFont: { weight: '600' }
-                    }
-                },
-                scales: {
-    x: {
-        display: true,
-        ticks: {
-            color: '#fff',
-            font: { size: 12 },
-
-        },
-        title: {
-            display: true,
-            text: 'Year',
-            color: '#fff',
-            font: { size: 14 },
-            padding: { top: 0, bottom: 5 }
-        }
-    },
-    y: {
-        display: true,
-        ticks: { color: '#fff' },
-        title: {
-            display: true,
-            text: 'Carbon (MtCO₂)',
-            color: '#fff'
-        }
-    }
-},
-                layout: {
-        padding: { bottom: 50}
-    }
-
+                });
+            } catch (err) {
+                console.error('Error loading fuel type graph', err);
+                document.getElementById('graph-placeholder').innerHTML =
+                    '<div style="color:#ccc; text-align:center;">Failed to load chart.</div>';
             }
-        });
-
-    } catch(err) {
-        console.error('Error loading carbon projection chart', err);
-    }
-}
-
-async function loadWaterBubbleChart() {
-    try {
-        const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water_carbon_data');
-        const data = await res.json();
-
-        if (!data || data.length === 0) {
-            document.getElementById('graph-placeholder').innerHTML =
-                '<div style="color:#ccc; text-align:center;">No water/carbon data available.</div>';
-            return;
         }
 
-        const maxWater = Math.max(...data.map(d => d.water_footprint));
 
-        const chartData = data.map(d => ({
-            x: d.total_mwh,
-            y: d.scarcity_factor,
-            r: Math.sqrt((d.water_footprint / maxWater * 300) / Math.PI),
-            raw: d,  // keep full data for tooltip
-            backgroundColor: "rgba(50,50,50,0.7)",
-            borderColor: "#fff",
-            borderWidth: 1
-        }));
+        async function loadWaterProjectionChart() {
+            try {
+                const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water_scenario');
+                const data = await res.json();
+                const points = data.points;
+                console.log("Water Scenario API returned:", data);
 
-        const placeholder = document.getElementById('graph-placeholder');
-        placeholder.style.width = '1200px';
-        placeholder.style.height = '800px';
-        placeholder.innerHTML = '<canvas id="water-bubble-chart"></canvas>';
+                // --- Group points by year ---
+                const yearMap = {};
+                points.forEach(p => {
+                    const year = p.year;
+                    if (!yearMap[year]) yearMap[year] = { best: null, worst: null };
+                    if (p.scenario.toLowerCase().includes("best")) yearMap[year].best = p.water_Mm3;
+                    if (p.scenario.toLowerCase().includes("worst")) yearMap[year].worst = p.water_Mm3;
+                });
 
-        const ctx = document.getElementById('water-bubble-chart').getContext('2d');
+                // Sort years
+                const years = Object.keys(yearMap).sort((a, b) => a - b);
 
-        if (window.waterBubbleChart) window.waterBubbleChart.destroy();
+                // Create series arrays
+                const bestSeries = years.map(y => yearMap[y].best ?? 0);
+                const worstSeries = years.map(y => yearMap[y].worst ?? 0);
 
-        window.waterBubbleChart = new Chart(ctx, {
-            type: 'bubble',
-            data: {
-                datasets: [{
-                    label: '',
-                    data: chartData
-                }]
-            },
-            options: {
-                responsive: true,
+                // --- Render Chart.js line chart ---
+                const ctx = document.getElementById('waterProjectionChart').getContext('2d');
 
-                interaction: {
-                    mode: 'nearest',
-                    intersect: true
-                },
+                // Only destroy if it’s a Chart.js instance
+                if (window.waterProjectionChart && window.waterProjectionChart instanceof Chart) {
+                    window.waterProjectionChart.destroy();
+                }
 
-                plugins: {
-                    tooltip: {
-                        title: () => '',
-                        callbacks: {
-                            label: function(context) {
-                                const d = context.raw;
-                                return `Scarcity: ${d.scarcity_factor}\nMWh: ${d.total_mwh.toLocaleString()}`;
+
+                window.waterProjectionChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: years,
+                        datasets: [
+                            {
+                                label: 'Best Water Projection',
+                                data: bestSeries,
+                                borderColor: 'green',
+                                fill: false,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Worst Water Projection',
+                                data: worstSeries,
+                                borderColor: 'red',
+                                fill: false,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { labels: { color: '#fff' } },
+                            tooltip: {
+                                backgroundColor: '#111827',
+                                titleColor: '#6EC1E4',
+                                bodyColor: '#fff',
+                                titleFont: { weight: '600' }
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { color: '#fff' } },
+                            y: {
+                                ticks: { color: '#fff' },
+                                title: { display: true, text: 'Water (Mm³)', color: '#fff' }
                             }
                         }
                     }
-                },
+                });
 
-                scales: {
-                    x: {
-                        type: 'linear',
-                        min: 0,
-                        max: 2.1e7,
-                        title: { display: true, text: 'Electricity used by data centers (MWh)', color: '#fff' },
-                        ticks: { color: '#fff' }
-                    },
-                    y: {
-                        min: 0,
-                        max: 105,
-                        title: { display: true, text: 'Water scarcity factor', color: '#fff' },
-                        ticks: { color: '#fff' }
-                    }
-                }
+            } catch (err) {
+                console.error('Error loading water projection chart', err);
             }
-        });
+        }
 
-    } catch (err) {
-        console.error(err);
-        document.getElementById('graph-placeholder').innerHTML =
-            '<div style="color:#ccc; text-align:center;">Failed to load chart.</div>';
-    }
-}
-</script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        let defaultLayer = 'air'; // or 'water', 'co2', etc.
-        showPanelsFor(defaultLayer); // hides filters if default is 'air'
-    });
-  </script>
+        async function loadCarbonProjectionChart() {
+            try {
+                const res = await fetch('https://data-center-map-nu1d.onrender.com/api/carbon_scenario');
+                const apiResponse = await res.json(); // 1. Renamed 'data' to 'apiResponse' for clarity
+                console.log("Carbon Scenario API returned:", apiResponse); // Check this log!
+                const points = apiResponse.data;
+
+                // --- FIX: Add a guard clause here ---
+                if (!points || !Array.isArray(points) || points.length === 0) {
+                    console.error("Carbon data is missing or not an array:", data);
+                    // Optional: Display a message in the modal instead of a chart
+                    const chartContainer = document.getElementById('carbonProjectionChart').parentElement;
+                    chartContainer.innerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; color:#ccc;">No Carbon Projection data available.</div>';
+                    return; // Stop execution if data is bad or missing
+                }
+
+                // --- Group points by year ---
+                const yearMap = {};
+                points.forEach(p => {
+                    const year = p.year;
+                    if (!yearMap[year]) yearMap[year] = { best: null, worst: null };
+                    if (p.scenario.toLowerCase().includes("best")) yearMap[year].best = p.carbon_MtCO2;
+                    if (p.scenario.toLowerCase().includes("worst")) yearMap[year].worst = p.carbon_MtCO2;
+                });
+
+                // Sort years
+                const years = Object.keys(yearMap).sort((a,b)=>a-b);
+
+                // Create series arrays
+                const bestSeries = years.map(y => yearMap[y].best ?? 0);
+                const worstSeries = years.map(y => yearMap[y].worst ?? 0);
+
+                // --- Render Chart.js line chart ---
+                const ctx = document.getElementById('carbonProjectionChart').getContext('2d');
+
+                // Only destroy if it’s a Chart.js instance
+                if (window.carbonProjectionChart && window.carbonProjectionChart instanceof Chart) {
+                    window.carbonProjectionChart.destroy();
+                }
+
+                window.carbonProjectionChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: years,
+                        datasets: [
+                            {
+                                label: 'Best Carbon Projection',
+                                data: bestSeries,
+                                borderColor: 'green',
+                                fill: false,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Worst Carbon Projection',
+                                data: worstSeries,
+                                borderColor: 'red',
+                                fill: false,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,  // important for modal
+                        plugins: {
+                            legend: { labels: { color: '#fff' } },
+                            tooltip: {
+                                backgroundColor: '#111827',
+                                titleColor: '#6EC1E4',
+                                bodyColor: '#fff',
+                                titleFont: { weight: '600' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                ticks: {
+                                    color: '#fff',
+                                    font: { size: 12 },
+
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Year',
+                                    color: '#fff',
+                                    font: { size: 14 },
+                                    padding: { top: 0, bottom: 5 }
+                                }
+                            },
+                            y: {
+                                display: true,
+                                ticks: { color: '#fff' },
+                                title: {
+                                    display: true,
+                                    text: 'Carbon (MtCO₂)',
+                                    color: '#fff'
+                                }
+                            }
+                        },
+                        layout: {
+                            padding: { bottom: 50}
+                        }
+
+                    }
+                });
+
+            } catch(err) {
+                console.error('Error loading carbon projection chart', err);
+            }
+        }
+
+        async function loadWaterBubbleChart() {
+            try {
+                const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water_carbon_data');
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    document.getElementById('graph-placeholder').innerHTML =
+                        '<div style="color:#ccc; text-align:center;">No water/carbon data available.</div>';
+                    return;
+                }
+
+                const maxWater = Math.max(...data.map(d => d.water_footprint));
+
+                const chartData = data.map(d => ({
+                    x: d.total_mwh,
+                    y: d.scarcity_factor,
+                    r: Math.sqrt((d.water_footprint / maxWater * 300) / Math.PI),
+                    raw: d,  // keep full data for tooltip
+                    backgroundColor: "rgba(50,50,50,0.7)",
+                    borderColor: "#fff",
+                    borderWidth: 1
+                }));
+
+                const placeholder = document.getElementById('graph-placeholder');
+                placeholder.style.width = '1200px';
+                placeholder.style.height = '800px';
+                placeholder.innerHTML = '<canvas id="water-bubble-chart"></canvas>';
+
+                const ctx = document.getElementById('water-bubble-chart').getContext('2d');
+
+                if (window.waterBubbleChart) window.waterBubbleChart.destroy();
+
+                window.waterBubbleChart = new Chart(ctx, {
+                    type: 'bubble',
+                    data: {
+                        datasets: [{
+                            label: '',
+                            data: chartData
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+
+                        interaction: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+
+                        plugins: {
+                            tooltip: {
+                                title: () => '',
+                                callbacks: {
+                                    label: function(context) {
+                                        const d = context.raw;
+                                        return `Scarcity: ${d.scarcity_factor}\nMWh: ${d.total_mwh.toLocaleString()}`;
+                                    }
+                                }
+                            }
+                        },
+
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                min: 0,
+                                max: 2.1e7,
+                                title: { display: true, text: 'Electricity used by data centers (MWh)', color: '#fff' },
+                                ticks: { color: '#fff' }
+                            },
+                            y: {
+                                min: 0,
+                                max: 105,
+                                title: { display: true, text: 'Water scarcity factor', color: '#fff' },
+                                ticks: { color: '#fff' }
+                            }
+                        }
+                    }
+                });
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('graph-placeholder').innerHTML =
+                    '<div style="color:#ccc; text-align:center;">Failed to load chart.</div>';
+            }
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let defaultLayer = 'air'; // or 'water', 'co2', etc.
+            showPanelsFor(defaultLayer); // hides filters if default is 'air'
+        });
+    </script>
 </body>
 </html>
