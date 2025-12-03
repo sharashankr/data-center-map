@@ -468,7 +468,10 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
     <div id="summary-overlay">
         <div id="summary-grid">
-            <div class="grid-box"><canvas id="plot-status"></canvas></div>
+            <div class="grid-box" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div id="total-dc-count" style="position: absolute; top: 10px; right: 16px; color:#fff; font-size:1.05rem; font-weight: 500; z-index:2;"></div>
+                <canvas id="plot-status"></canvas>
+            </div>
             <div class="grid-box"><canvas id="plot-states"></canvas></div>
             <div class="grid-box"><canvas id="plot-operators"></canvas></div>
             <div class="grid-box"><canvas id="plot-size"></canvas></div>
@@ -1212,19 +1215,37 @@ function setLegend(layer){
                             labels: status_counts.map(d => d.Count),
                             datasets: [{
                                 data: status_counts.map(d => d.count),
-                                backgroundColor: ['#4daf4a','#377eb8','#ff7f00','#984ea3','#e41a1c', '#f781bf']
+                                backgroundColor: [
+                                    '#7C83FD', // muted blue
+                                    '#F7B267', // muted orange
+                                    '#FFD166', // muted yellow
+                                    '#70E3B1', // muted green
+                                    '#5EC8E6', // muted cyan
+                                    '#FF70A6'  // muted pink
+                                ],
+                                hoverBackgroundColor: [
+                                    '#A3A3F7',
+                                    '#F7B7A3',
+                                    '#F7E3A3',
+                                    '#A3F7BF',
+                                    '#A3E7F7',
+                                    '#F7A3C7'
+                                ]
                             }]
                         },
                         options: {
                             responsive: true,
-                            maintainAspectRatio: false, // <-- Necessary to prevent horizontal stretching
-                            aspectRatio: 1,           // <-- FIX: Forces the chart area to be a square (1:1)
+                            maintainAspectRatio: false,
+                            aspectRatio: 1,
                             plugins: {
                                 legend: { position: 'bottom', labels: { color: '#fff' } },
                                 title: { display:true, text:'Project Status', color: '#fff' }
                             }
                         }
                     });
+                    // Display total number of data centers
+                    const totalCount = status_counts.reduce((sum, d) => sum + (typeof d.count === 'number' ? d.count : 0), 0);
+                    document.getElementById('total-dc-count').innerText = `Total Data Centers: ${totalCount}`;
                 } else {
                     document.getElementById('plot-status').parentElement.innerHTML = '<div class="grid-box" style="color:#ccc; text-align:center;">No Status data available.</div>';
                 }
@@ -1238,14 +1259,17 @@ function setLegend(layer){
                             datasets: [{
                                 label: 'Facilities',
                                 data: top_states.map(d => d.count),
-                                backgroundColor: '#377eb8'
+                                backgroundColor: [
+                                    '#7C83FD', '#F7B267', '#FFD166', '#70E3B1', '#5EC8E6',
+                                    '#FF70A6', '#A3A3F7', '#F7B7A3', '#F7E3A3', '#A3F7BF'
+                                ]
                             }]
                         },
                         options: {
                             indexAxis: 'y',
                             responsive: true,
-                            maintainAspectRatio: false, // <-- ENSURE this is set here
-                            plugins: { legend: { display: false }, title: { display:true, text:'Top States', color: '#fff' } },
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false }, title: { display:true, text:'States with Most Data Centers', color: '#fff' } },
                             scales: { x: { ticks: { color: '#fff' } }, y: { ticks: { color: '#fff' } } }
                         }
                     });
@@ -1259,32 +1283,39 @@ function setLegend(layer){
                     const counts = top_operators.map(d => d.count);
                     const labels = top_operators.map(d => d.Count);
 
+                    // Balanced color palette for lollipop sticks and balls
+                    const balancedSticks = [
+                        'rgba(124,131,253,0.45)', 'rgba(247,178,103,0.45)', 'rgba(255,209,102,0.45)',
+                        'rgba(112,227,177,0.45)', 'rgba(94,200,230,0.45)', 'rgba(255,112,166,0.45)',
+                        'rgba(163,163,247,0.45)', 'rgba(247,183,163,0.45)', 'rgba(247,227,163,0.45)', 'rgba(163,247,191,0.45)'
+                    ];
+                    const balancedBalls = [
+                        '#7C83FD', '#F7B267', '#FFD166', '#70E3B1', '#5EC8E6',
+                        '#FF70A6', '#A3A3F7', '#F7B7A3', '#F7E3A3', '#A3F7BF'
+                    ];
                     window.plotOperatorsChart = new Chart(document.getElementById('plot-operators').getContext('2d'), {
-                        // We use 'bar' as the base type for the vertical category axis (y-axis)
                         type: 'bar',
                         data: {
                             labels: labels,
                             datasets: [{
-                                // Dataset 1: The Stick (Thin Bar)
                                 label: 'Facilities',
                                 data: counts,
-                                backgroundColor: 'rgba(255, 127, 14, 0.2)', // Faint color for the stick
+                                backgroundColor: balancedSticks,
                                 borderColor: 'transparent',
                                 borderWidth: 0,
-                                barPercentage: 0.2, // Make the stick thin (adjust this value to change thinness)
+                                barPercentage: 0.2,
                                 categoryPercentage: 0.8,
                                 borderRadius: 0,
                             }, {
-                                // Dataset 2: The Ball (Scatter/Dot placed at the end of the stick)
                                 label: 'Marker',
                                 data: counts,
-                                type: 'scatter', // Overlay a scatter plot for the dots
-                                pointRadius: 7, // Size of the ball
-                                pointBackgroundColor: '#ff7f0e', // Ball color
+                                type: 'scatter',
+                                pointRadius: 7,
+                                pointBackgroundColor: balancedBalls,
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2,
                                 pointStyle: 'circle',
-                                order: 0, // Ensure the ball is drawn on top of the stick
+                                order: 0,
                             }]
                         },
                         options: {
@@ -1292,11 +1323,11 @@ function setLegend(layer){
                             responsive: true,
                             maintainAspectRatio: false,
                             layout: {
-                                padding: { right: 10 } // Add padding to ensure the ball fits on the right edge
+                                padding: { right: 10 }
                             },
                             plugins: {
                                 legend: { display:false },
-                                title: { display:true, text:'Top 10 Operators (Lollipop)', color: '#fff' }
+                                title: { display:true, text:'Top 10 Data Center Operators', color: '#fff' }
                             },
                             scales: {
                                 x: {
