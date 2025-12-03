@@ -303,9 +303,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
         Directions on Navigating the Page
     </div>
 
-    <div id="map-info-box">
-        <button id="close-info-box" style="position:absolute; top:12px; right:16px; background:transparent; border:none; color:#fff; font-size:1.3rem; cursor:pointer; z-index:10;">✖</button>
-    </div>
+    <div id="map-info-box"></div>
 
     <style>
         #map-info-box {
@@ -362,6 +360,26 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
         function updateInfoBox(layer) {
             box.innerHTML = layerInfo[layer] || '<div>No info available for this layer.</div>';
+            // Always inject the X button when updating the box
+            if (!document.getElementById('close-info-box')) {
+                const closeBtnEl = document.createElement('button');
+                closeBtnEl.id = 'close-info-box';
+                closeBtnEl.innerText = '✖';
+                closeBtnEl.style.position = 'absolute';
+                closeBtnEl.style.top = '12px';
+                closeBtnEl.style.right = '16px';
+                closeBtnEl.style.background = 'transparent';
+                closeBtnEl.style.border = 'none';
+                closeBtnEl.style.color = '#fff';
+                closeBtnEl.style.fontSize = '1.3rem';
+                closeBtnEl.style.cursor = 'pointer';
+                closeBtnEl.style.zIndex = '10';
+                closeBtnEl.addEventListener('click', () => {
+                    box.style.display = 'none';
+                    btn.innerText = 'Directions on Navigating the Page';
+                });
+                box.appendChild(closeBtnEl);
+            }
         }
 
         // Default to AirQuality initially
