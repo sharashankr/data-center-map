@@ -1189,7 +1189,7 @@ async function loadDataCenterSummary() {
   if (window.plotSizeChart) window.plotSizeChart.destroy();
 
   try {
-    const res = await fetch('http://127.0.0.1:3000/api/data_center_summary');
+    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/data_center_summary');
     const data = await res.json();
 
     // ----------------------------------------------------
