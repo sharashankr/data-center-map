@@ -215,8 +215,8 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
         .nav-item:hover { background:rgba(255,255,255,0.1); border-radius:6px; }
         .nav-item.active { border-bottom:3px solid #6EC1E4; }
 
-        /* .legend { position:absolute; bottom:10px; left:10px; background:rgba(30,41,59,0.9); color:#fff;
-            padding:10px; border-radius:8px; font-size:0.8rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:500; } */
+        .legend { position:absolute; bottom:10px; left:10px; background:rgba(30,41,59,0.9); color:#fff;
+            padding:10px; border-radius:8px; font-size:0.8rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:500; }
         .legend div { display:flex; align-items:center; margin-bottom:4px; }
         .legend span { display:inline-block; width:16px; height:16px; margin-right:6px; border-radius:4px; }
 
@@ -627,30 +627,47 @@ function setLegend(layer){
   legend.innerHTML = '';
   if(layer==='air'){
     legend.innerHTML = `
-      <div><span style="background:green"></span>Good</div>
-      <div><span style="background:yellow"></span>Moderate</div>
-      <div><span style="background:orange"></span>Unhealthy for Sensitive</div>
-      <div><span style="background:red"></span>Unhealthy</div>
-      <div><span style="background:purple"></span>Very Unhealthy</div>
-      <div><span style="background:whitesmoke"></span>Data Center</div>
-    `;
+  <div><span style="background:green"></span>Good (0–50)</div>
+  <div><span style="background:yellow"></span>Moderate (51–100)</div>
+  <div><span style="background:orange"></span>Unhealthy for Sensitive (101–150)</div>
+  <div><span style="background:red"></span>Unhealthy (151–200)</div>
+  <div><span style="background:purple"></span>Very Unhealthy (201–300)</div>
+  <div><span style="background:#7E0023"></span>Hazardous (300+)</div>
+  <div><span style="background:whitesmoke"></span>Data Center</div>
+`;
+
   } else if(layer==='water'){
-    legend.innerHTML = `
-      <div><span style="background:blue;opacity:0.5;"></span>Low footprint</div>
-      <div><span style="background:cyan;opacity:0.5;"></span>Moderate</div>
-      <div><span style="background:lime;opacity:0.5;"></span>High</div>
-      <div><span style="background:yellow;opacity:0.5;"></span>Very High</div>
-      <div><span style="background:red;opacity:0.5;"></span>Extreme</div>
-      <div><span style="background:white;opacity:0.5;"></span>Data Center</div>
-    `;
+   legend.innerHTML = `
+  <div><span style="background:#3B82F6;opacity:0.5;"></span>Low footprint</div>
+  <div><span style="background:#0EA5E9;opacity:0.5;"></span>Moderate footprint</div>
+  <div><span style="background:#06B6D4;opacity:0.5;"></span>High footprint</div>
+  <div><span style="background:#22C55E;opacity:0.5;"></span>Very High footprint</div>
+  <div><span style="background:#F87171;opacity:0.5;"></span>Extreme footprint</div>
+  <div><span style="background:white;opacity:0.5;"></span>Data Center</div>
+`;
+
+
   }
   else if(layer === 'co2'){
   legend.innerHTML = `
-    <div><span style="background:#00ff00"></span>Low CO₂</div>
-    <div><span style="background:#aaff00"></span>Moderate</div>
-    <div><span style="background:#ffff00"></span>High</div>
-    <div><span style="background:#ff8800"></span>Very High</div>
-    <div><span style="background:#ff0000"></span>Extreme</div>
+  <div><span style="background:#FFD580"></span>Low CO₂</div>
+<div><span style="background:#FFA500"></span>Moderate CO₂</div>
+<div><span style="background:#FF6A00"></span>High CO₂</div>
+<div><span style="background:#FF0000"></span>Very High CO₂</div>
+<div><span style="background:#8B0000"></span>Extreme CO₂</div>
+<div><span style="background:whitesmoke"></span>Data Center</div>
+
+`;
+
+}
+
+  else if(layer === 'power'){
+  legend.innerHTML = `
+    <div><span style="background:#FFF3BF"></span>Low Power</div>
+    <div><span style="background:#FFD580"></span>Moderate Power</div>
+    <div><span style="background:#FFA500"></span>High Power</div>
+    <div><span style="background:#FF6A00"></span>Very High Power</div>
+    <div><span style="background:#FF0000"></span>Extreme Power</div>
     <div><span style="background:whitesmoke"></span>Data Center</div>
   `;
 }
@@ -705,37 +722,69 @@ function setLegend(layer){
         }
 
 
-         // --- Load AQI Markers Only ---
-// --- Load AQI Heatmap ---
-        async function loadAQIHeatmap(){
-            try {
-                const res = await fetch(`https://data-center-map-nu1d.onrender.com/api/monitors?pollutant=${currentPollutant}`);
-                const data = await res.json();
-                monitorData = data.monitors||[];
+// --- Load AQI Markers Only (Colored + Smaller Sized by AQI) ---
+async function loadAQIHeatmap() {
+    try {
+        const res = await fetch(`https://data-center-map-nu1d.onrender.com/api/monitors?pollutant=${currentPollutant}`);
+        const data = await res.json();
+        monitorData = data.monitors || [];
 
-                if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; }
-
-                const points = monitorData.map(m=>[m.lat, m.lon, Math.min(m.aqi/500,0.6)]);
-                heatLayer = L.heatLayer(points,{radius:15,blur:8,maxZoom:10,gradient:{0:'green',0.3:'yellow',0.6:'orange',0.8:'red',1:'purple'}}).addTo(map);
-
-                // Add invisible circle markers for tooltips **only if Air layer active**
-                if(currentLayer==="air"){
-                    aqiMarkers.forEach(m => map.removeLayer(m)); // clear old AQI markers
-                    aqiMarkers = [];
-
-                    monitorData.forEach(m => {
-                        const marker = L.circleMarker([m.lat, m.lon], {radius:0.1, opacity:0})
-                            .addTo(map)
-                            .bindTooltip(`AQI: ${m.aqi}`, {direction:'top', className:'aqi-tooltip'});
-                        aqiMarkers.push(marker); // store marker for later clearing
-                    });
-                }
-
-
-                document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
-                setLegend('air');
-            } catch(err){ console.error(err); }
+        // Remove old heat layer (not used anymore)
+        if (heatLayer) {
+            map.removeLayer(heatLayer);
+            heatLayer = null;
         }
+
+        // Clear old markers
+        aqiMarkers.forEach(m => map.removeLayer(m));
+        aqiMarkers = [];
+
+        monitorData.forEach(m => {
+            const aqi = m.aqi;
+
+            // --- Color scale based on AQI ---
+            let color = "green";
+            if (aqi > 50)  color = "yellow";
+            if (aqi > 100) color = "orange";
+            if (aqi > 150) color = "red";
+            if (aqi > 200) color = "purple";
+            if (aqi > 300) color = "#7E0023";
+
+            // --- Smaller Size scale ---
+            // Now: min 1px, max 5px
+            const size = Math.min(5, Math.max(1, aqi / 60));
+
+
+            const marker = L.circleMarker([m.lat, m.lon], {
+                radius: size,
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.85,
+                weight: 1
+            })
+            .addTo(map)
+            .bindTooltip(`AQI: ${aqi}`, {
+                direction: 'top',
+                className: 'aqi-tooltip'
+            });
+
+            aqiMarkers.push(marker);
+        });
+
+        // Update timestamp + legend
+        document.getElementById('footer-timestamp').innerText =
+            `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+        setLegend('air');
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+
+
+
+
 
 
         async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
@@ -998,25 +1047,38 @@ function setLegend(layer){
     // Pulsating markers
     powerMarkers = [];
     filteredForPlot.forEach(p => {
-      const intensity = Math.min((parseFloat(p.total_mwh)||0)/maxPower, 1);
-      const baseRadius = 4 + intensity * 10;
+    const raw = parseFloat(p.total_mwh) || 0;
 
+    // Normalize total power to 0–1
+    const intensity = Math.min(raw / maxPower, 1);
 
-      const marker = L.circleMarker([p.lat, p.lon], {
-        radius: baseRadius,
-        color:'#F59E42',
-        fillColor:'#F59E42',
-        fillOpacity:0.6,
-        weight:1
-      }).addTo(map);
+    // --- Color gradient based on intensity ---
+    let color;
+    if (intensity < 0.2) color = '#FFF3BF';      // light yellow
+    else if (intensity < 0.4) color = '#FFD580'; // yellow-orange
+    else if (intensity < 0.6) color = '#FFA500'; // orange
+    else if (intensity < 0.8) color = '#FF6A00'; // deep orange
+    else color = '#FF0000';                        // red
 
-                    marker.bindTooltip(
-                        `Power: ${p.total_mwh.toLocaleString()} MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
-                        { direction:'top', className:'aqi-tooltip' }
-                    );
+    // --- Smaller radius scaling ---
+    const radius = 2 + intensity * 6; // 2px → 8px
 
-                    powerMarkers.push({ marker, baseRadius, intensity });
-                });
+    const marker = L.circleMarker([p.lat, p.lon], {
+        radius: radius,
+        fillColor: color,
+        color: color,
+        fillOpacity: 0.6,
+        weight: 1
+    }).addTo(map);
+
+    marker.bindTooltip(
+        `Power: ${raw.toLocaleString()} MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
+        { direction:'top', className:'aqi-tooltip' }
+    );
+
+    powerMarkers.push({ marker, radius, intensity });
+});
+
 
                 document.getElementById('footer-timestamp').innerText =
                     `Updated: ${new Date(data.timestamp).toLocaleString()}`;
@@ -1146,23 +1208,40 @@ function setLegend(layer){
                 //    gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
                 // }).addTo(map);
 
-    filteredForPlot.forEach(p => {
-      const raw = parseFloat(p.carbon_footprint) || 0;
-      const normalized = Math.min((raw / maxCarbon) * 100, 1);
-      const colorIntensity = `rgba(255,0,0,${0.6 + 0.4*normalized})`;
-      const marker = L.circleMarker([p.lat, p.lon], {
-        radius: 5,
-        fillColor: '#F87171',
-        color: '#F87171',
+   filteredForPlot.forEach(p => {
+    const raw = parseFloat(p.carbon_footprint) || 0;
+
+    // Normalize carbon footprint to 0–1
+    const normalized = Math.min(raw / maxCarbon, 1);
+
+    // --- Color gradient from light orange → red → dark red ---
+    let color;
+    if (normalized < 0.2) color = '#FFD580';       // light orange
+    else if (normalized < 0.4) color = '#FFA500';  // orange
+    else if (normalized < 0.6) color = '#FF6A00';  // deep orange
+    else if (normalized < 0.8) color = '#FF0000';  // red
+    else color = '#8B0000';                         // dark red / maroon
+
+    // --- Radius scales with normalized value ---
+    const radius = 5 + normalized * 15; // 5px → 20px
+
+    const marker = L.circleMarker([p.lat, p.lon], {
+        radius: radius,
+        fillColor: color,
+        color: color,
         fillOpacity: 0.8,
         weight: 0.5
-      }).addTo(map)
-        .bindTooltip(
+    }).addTo(map)
+      .bindTooltip(
           `CO₂: ${p.carbon_footprint.toLocaleString()} kg/MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
-          {direction:'top', className:'aqi-tooltip'}
-        );
-      carbonMarkers.push(marker);
-    });
+          { direction: 'top', className: 'aqi-tooltip' }
+      );
+
+    carbonMarkers.push(marker);
+});
+
+
+
 
                 document.getElementById('footer-timestamp').innerText =
                     `Updated: ${new Date(data.timestamp).toLocaleString()}`;
