@@ -706,48 +706,36 @@ function setLegend(layer){
 
 
          // --- Load AQI Markers Only ---
-async function loadAQIHeatmap() {
-    try {
-        const res = await fetch(`https://data-center-map-nu1d.onrender.com/api/monitors?pollutant=${currentPollutant}`);
-        const data = await res.json();
-        monitorData = data.monitors || [];
+// --- Load AQI Heatmap ---
+        async function loadAQIHeatmap(){
+            try {
+                const res = await fetch(`https://data-center-map-nu1d.onrender.com/api/monitors?pollutant=${currentPollutant}`);
+                const data = await res.json();
+                monitorData = data.monitors||[];
 
-        // Remove any existing heat layer (not used anymore)
-        if (heatLayer) {
-            map.removeLayer(heatLayer);
-            heatLayer = null;
+                if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; }
+
+                const points = monitorData.map(m=>[m.lat, m.lon, Math.min(m.aqi/500,0.6)]);
+                heatLayer = L.heatLayer(points,{radius:15,blur:8,maxZoom:10,gradient:{0:'green',0.3:'yellow',0.6:'orange',0.8:'red',1:'purple'}}).addTo(map);
+
+                // Add invisible circle markers for tooltips **only if Air layer active**
+                if(currentLayer==="air"){
+                    aqiMarkers.forEach(m => map.removeLayer(m)); // clear old AQI markers
+                    aqiMarkers = [];
+
+                    monitorData.forEach(m => {
+                        const marker = L.circleMarker([m.lat, m.lon], {radius:0.1, opacity:0})
+                            .addTo(map)
+                            .bindTooltip(`AQI: ${m.aqi}`, {direction:'top', className:'aqi-tooltip'});
+                        aqiMarkers.push(marker); // store marker for later clearing
+                    });
+                }
+
+
+                document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+                setLegend('air');
+            } catch(err){ console.error(err); }
         }
-
-        // Clear old AQI markers
-        aqiMarkers.forEach(m => map.removeLayer(m));
-        aqiMarkers = [];
-
-        // Add markers only (visible circleMarkers)
-        monitorData.forEach(m => {
-            const marker = L.circleMarker([m.lat, m.lon], {
-                radius: 6,
-                color: "gray",
-                fillColor: "gray",
-                fillOpacity: 0.7
-            })
-            .addTo(map)
-            .bindTooltip(`AQI: ${m.aqi}`, {
-                direction: 'top',
-                className: 'aqi-tooltip'
-            });
-
-            aqiMarkers.push(marker);
-        });
-
-        // Update timestamp + legend
-        document.getElementById('footer-timestamp').innerText =
-            `Updated: ${new Date(data.timestamp).toLocaleString()}`;
-        setLegend('air');
-
-    } catch (err) {
-        console.error(err);
-    }
-}
 
 
         async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
