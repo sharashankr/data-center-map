@@ -117,26 +117,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
         }
         #more-insights .insight-item { cursor:pointer; display:flex; align-items:center; gap:6px; }
 
-        /* Central Graph Panel (Water vs Carbon) */
-        #insight-graph-panel {
-            position:absolute;
-            top:50%;
-            left:50%;
-            transform:translate(-50%, -50%);
-            width:80vw;        /* increased width relative to viewport */
-            height:70vh;       /* increased height relative to viewport */
-            max-width:1200px; /* optional max limits */
-            max-height:900px;
-            background:rgba(15,42,66,0.95);
-            border-radius:12px;
-            box-shadow:0 8px 20px rgba(0,0,0,0.5);
-            color:#fff;
-            display:none;
-            flex-direction:column;
-            z-index:600;
-            padding:20px;
-            overflow:auto;      /* allow scrolling if needed */
-        }
+        
 
         /* Graph placeholder fills the panel */
         #graph-placeholder {
@@ -1616,23 +1597,7 @@ function setLegend(layer){
             document.getElementById('more-insights').appendChild(tab);
         }
 
-        // --- NEW: Water vs Carbon Chart ---
-        function addWaterVsCarbonTab() {
-            const existingTab = document.getElementById('water-vs-carbon-tab');
-            if(existingTab) existingTab.remove();
-
-            const tab = document.createElement('div');
-            tab.id = 'water-vs-carbon-tab';
-            tab.className = 'insight-item';
-            tab.innerHTML = '<i class="fas fa-chart-line" style="color:#22C55E;"></i> Water vs Carbon Chart';
-            tab.style.cursor = 'pointer';
-
-            tab.addEventListener('click', () => {
-                const panel = document.getElementById('insight-graph-panel');
-                panel.style.display = 'flex';
-                document.getElementById('graph-title').innerText = 'Water vs Power Tradeoff';
-                loadWaterBubbleChart();
-            });
+       
 
 
             // Insert after Water Projection tab
