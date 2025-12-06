@@ -69,7 +69,8 @@ def load_monitor_data():
             mean_idx = header.index('Arithmetic Mean')
             site_name_idx = header.index('Local Site Name')
             pollutant_idx = header.index('Parameter Name')
-            state = header.index('State Name')
+            # *** ADDED: Index for the 'State Name' column
+            state_name_idx = header.index('State Name') 
         except ValueError as e:
             print(f"Missing column in monitor CSV: {e}")
             return
@@ -81,15 +82,18 @@ def load_monitor_data():
                 lon = float(row[lon_idx])
                 conc = float(row[mean_idx])
                 city = row[site_name_idx]
-                state = row[state]
                 pollutant = row[pollutant_idx].lower()
+                # *** ADDED: Retrieve the state name
+                state = row[state_name_idx] 
                 aqi, color = get_aqi_and_color_proxy(conc)
+                
                 MONITOR_DATA.append({
                     "lat": lat,
                     "lon": lon,
                     "aqi": aqi,
                     "city": city,
-                    "state": state,
+                    # *** UPDATED: Include the state data
+                    "state": state, 
                     "color": color,
                     "pollutant": pollutant
                 })
