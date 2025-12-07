@@ -1485,34 +1485,34 @@ async function loadPowerHeatmap(
             const maxPower = Math.max(...filteredForPlot.map(p => parseFloat(p.total_mwh) || 1));
 
             powerMarkers = [];
-            filteredForPlot.forEach(p => {
-                const raw = parseFloat(p.total_mwh) || 0;
-                const intensity = Math.min(raw / maxPower, 1);
+filteredForPlot.forEach(p => {
+    const raw = parseFloat(p.total_mwh) || 0;
+    const intensity = Math.min(raw / maxPower, 1);
 
-                let color;
-                if (intensity < 0.2) color = '#FFF3BF';
-                else if (intensity < 0.4) color = '#FFD580';
-                else if (intensity < 0.6) color = '#FFA500';
-                else if (intensity < 0.8) color = '#FF6A00';
-                else color = '#FF0000';
+    // Color can still depend on intensity (optional)
+    let color;
+    if (intensity < 0.2) color = '#FFF3BF';
+    else if (intensity < 0.4) color = '#FFD580';
+    else if (intensity < 0.6) color = '#FFA500';
+    else if (intensity < 0.8) color = '#FF6A00';
+    else color = '#FF0000';
 
-                const radius = 2 + intensity * 6;
+    const marker = L.circleMarker([p.lat, p.lon], {
+        radius: 5,           // constant size for all markers
+        fillColor: color,
+        color: color,
+        fillOpacity: 0.6,
+        weight: 1
+    }).addTo(map);
 
-                const marker = L.circleMarker([p.lat, p.lon], {
-                    radius: radius,
-                    fillColor: color,
-                    color: color,
-                    fillOpacity: 0.6,
-                    weight: 1
-                }).addTo(map);
+    marker.bindTooltip(
+        `Power: ${raw.toLocaleString()} MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
+        { direction:'top', className:'aqi-tooltip' }
+    );
 
-                marker.bindTooltip(
-                    `Power: ${raw.toLocaleString()} MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
-                    { direction:'top', className:'aqi-tooltip' }
-                );
+    powerMarkers.push({ marker, intensity });
+});
 
-                powerMarkers.push({ marker, radius, intensity });
-            });
         }
 
         // ------------------------------------------------------------
@@ -1743,46 +1743,41 @@ function clearHeatLayer() {
                 console.error("renderStateChoroplethCarbon is not defined! Cannot draw state polygons.");
             }
         } else {
-            // **B. POINT PLOTTING (Original Marker Logic)**
+            // --- POINT PLOTTING (Original Marker Logic) ---
+let filteredForPlot = filteredData;
+if (!filteredForPlot.length) return;
 
-            // The data used for plotting markers is the initial filtered dataset
-            let filteredForPlot = filteredData;
+// Optional: keep color gradient based on normalized footprint
+const maxCarbonPoint = Math.max(...filteredForPlot.map(p => parseFloat(p.carbon_footprint) || 1));
 
-            if (!filteredForPlot.length) return;
+filteredForPlot.forEach(p => {
+    const raw = parseFloat(p.carbon_footprint) || 0;
+    const normalized = Math.min(raw / maxCarbonPoint, 1);
 
-            // Recalculate maxCarbon based on the points data for marker size/color normalization
-            const maxCarbonPoint = Math.max(...filteredForPlot.map(p => parseFloat(p.carbon_footprint) || 1));
+    // Color gradient (optional)
+    let color;
+    if (normalized < 0.2) color = '#FFD580';
+    else if (normalized < 0.4) color = '#FFA500';
+    else if (normalized < 0.6) color = '#FF6A00';
+    else if (normalized < 0.8) color = '#FF0000';
+    else color = '#8B0000';
 
-            filteredForPlot.forEach(p => {
-                const raw = parseFloat(p.carbon_footprint) || 0;
-                // Normalize carbon footprint to 0–1 using point max
-                const normalized = Math.min(raw / maxCarbonPoint, 1);
+    // --- Fixed marker radius ---
+    const marker = L.circleMarker([p.lat, p.lon], {
+        radius: 5,           // constant size
+        fillColor: color,
+        color: color,
+        fillOpacity: 0.8,
+        weight: 0.5
+    }).addTo(map)
+    .bindTooltip(
+        `CO₂: ${raw.toLocaleString()} kg/MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
+        { direction: 'top', className: 'aqi-tooltip' }
+    );
 
-                // --- Color gradient from light orange → red → dark red (Original Style) ---
-                let color;
-                if (normalized < 0.2) color = '#FFD580';       // light orange
-                else if (normalized < 0.4) color = '#FFA500';  // orange
-                else if (normalized < 0.6) color = '#FF6A00';  // deep orange
-                else if (normalized < 0.8) color = '#FF0000';  // red
-                else color = '#8B0000';                         // dark red / maroon
+    carbonMarkers.push(marker);
+});
 
-                // --- Radius scales with normalized value (Original Style) ---
-                const radius = 5 + normalized * 15; // 5px → 20px
-
-                const marker = L.circleMarker([p.lat, p.lon], {
-                    radius: radius,
-                    fillColor: color,
-                    color: color,
-                    fillOpacity: 0.8,
-                    weight: 0.5
-                }).addTo(map)
-                .bindTooltip(
-                    `CO₂: ${raw.toLocaleString()} kg/MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
-                    { direction: 'top', className: 'aqi-tooltip' }
-                );
-
-                carbonMarkers.push(marker);
-            });
         }
 
 
