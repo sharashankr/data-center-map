@@ -97,27 +97,34 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
 
 Clone the repository:
 <pre>
-  ```bash 
   git clone https://github.com/sharashankr/data-center-map.git
   cd data-center-map  
- ```
 </pre>
 
-
 Create and activate a virtual environment:
-python -m venv .venv
+<pre>
+  python -m venv .venv
+</pre>
 
 Windows:
-.venv\Scripts\activate
+<pre>
+  .venv\Scripts\activate
+</pre>
 
 macOS / Linux:
-source .venv/bin/activate
+<pre>
+ source .venv/bin/activate 
+</pre>
 
 Install Dependencies:
-pip install -r requirements.txt
+<pre>
+  pip install -r requirements.txt
+</pre>
 
 Run the backend server:
-python backend.py
+<pre>
+  python backend.py
+</pre>
 
 Backend will start on http://127.0.0.1:5000
 
