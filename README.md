@@ -141,4 +141,21 @@ http://127.0.0.1:8000/app.html
 
 Make sure the frontend API URLs match your backend environment.
 
+## Data Sources & Assumptions
+
+AQI datasets:
+
+-OZ_PM_AQI.csv
+-annual_conc_by_monitor_2025.csv
+-Water / Power / CO₂ footprint:
+-final_footprint_dataset (2).csv
+-updated_data_file.csv
+
+Aggregation uses:
+
+-State
+-Fuel type
+-PCA zones
+-Geospatial coordinates
+
 
