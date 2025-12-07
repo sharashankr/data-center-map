@@ -680,78 +680,48 @@ btn.addEventListener('click', () => {
         let powerHeatLayer = null;
         let powerPulseInterval = null;
 
-// --- Dynamic 4-category legend ---
-function updateLegend(maxAqi) {
-    if (!maxAqi || maxAqi <= 0) maxAqi = 1; // fallback
-
-    const step = maxAqi / 4;
-
-    const ranges = [
-        { color: 'green', label: `0 – ${step.toFixed(1)}` },
-        { color: 'yellow', label: `${step.toFixed(1)} – ${(2*step).toFixed(1)}` },
-        { color: 'orange', label: `${(2*step).toFixed(1)} – ${(3*step).toFixed(1)}` },
-        { color: 'red', label: `${(3*step).toFixed(1)} – ${maxAqi.toFixed(1)}` },
-    ];
-
-    const legend = document.getElementById('aqi-legend');
-    if (!legend) return;
-
-    legend.innerHTML = ranges.map(r => `
-        <div>
-            <span style="background:${r.color}"></span>${r.label}
-        </div>
-    `).join('') + `
-        <div><span style="background:whitesmoke"></span>Data Center</div>
-    `;
-}
-
 // --- Legends ---
-function setLegend(layer, maxAqi = null) {
+function setLegend(layer) {
     const legend = document.getElementById('legend');
     if (!legend) return;
 
     legend.innerHTML = ''; // clear previous content
 
     if(layer === 'air') {
-        if (maxAqi !== null) {
-            // Use dynamic 4-category legend
-            updateLegend(maxAqi);
-        } else {
-            // Fallback: static legend
-            legend.innerHTML = `
-              <div><span style="background:green"></span>0 – 50</div>
-              <div><span style="background:yellow"></span>51 – 100</div>
-              <div><span style="background:orange"></span>101 – 150</div>
-              <div><span style="background:red"></span>151 – 200</div>
-              <div><span style="background:whitesmoke"></span>Data Center</div>
-            `;
-        }
+        // Fixed 4-category legend
+        legend.innerHTML = `
+            <div><span style="background:green"></span>0 – 5</div>
+            <div><span style="background:yellow"></span>6 – 15</div>
+            <div><span style="background:orange"></span>16 – 35</div>
+            <div><span style="background:red"></span>36+</div>
+            <div><span style="background:whitesmoke"></span>Data Center</div>
+        `;
     } else if(layer === 'water') {
         legend.innerHTML = `
-          <div><span style="background:#3B82F6;opacity:0.5;"></span>Low footprint</div>
-          <div><span style="background:#0EA5E9;opacity:0.5;"></span>Moderate footprint</div>
-          <div><span style="background:#06B6D4;opacity:0.5;"></span>High footprint</div>
-          <div><span style="background:#22C55E;opacity:0.5;"></span>Very High footprint</div>
-          <div><span style="background:#F87171;opacity:0.5;"></span>Extreme footprint</div>
-          <div><span style="background:white;opacity:0.5;"></span>Data Center</div>
+            <div><span style="background:#3B82F6;opacity:0.5;"></span>Low footprint</div>
+            <div><span style="background:#0EA5E9;opacity:0.5;"></span>Moderate footprint</div>
+            <div><span style="background:#06B6D4;opacity:0.5;"></span>High footprint</div>
+            <div><span style="background:#22C55E;opacity:0.5;"></span>Very High footprint</div>
+            <div><span style="background:#F87171;opacity:0.5;"></span>Extreme footprint</div>
+            <div><span style="background:white;opacity:0.5;"></span>Data Center</div>
         `;
     } else if(layer === 'co2') {
         legend.innerHTML = `
-          <div><span style="background:#FFD580"></span>Low CO₂</div>
-          <div><span style="background:#FFA500"></span>Moderate CO₂</div>
-          <div><span style="background:#FF6A00"></span>High CO₂</div>
-          <div><span style="background:#FF0000"></span>Very High CO₂</div>
-          <div><span style="background:#8B0000"></span>Extreme CO₂</div>
-          <div><span style="background:whitesmoke"></span>Data Center</div>
+            <div><span style="background:#FFD580"></span>Low CO₂</div>
+            <div><span style="background:#FFA500"></span>Moderate CO₂</div>
+            <div><span style="background:#FF6A00"></span>High CO₂</div>
+            <div><span style="background:#FF0000"></span>Very High CO₂</div>
+            <div><span style="background:#8B0000"></span>Extreme CO₂</div>
+            <div><span style="background:whitesmoke"></span>Data Center</div>
         `;
     } else if(layer === 'power') {
         legend.innerHTML = `
-          <div><span style="background:#FFF3BF"></span>Low Power</div>
-          <div><span style="background:#FFD580"></span>Moderate Power</div>
-          <div><span style="background:#FFA500"></span>High Power</div>
-          <div><span style="background:#FF6A00"></span>Very High Power</div>
-          <div><span style="background:#FF0000"></span>Extreme Power</div>
-          <div><span style="background:whitesmoke"></span>Data Center</div>
+            <div><span style="background:#FFF3BF"></span>Low Power</div>
+            <div><span style="background:#FFD580"></span>Moderate Power</div>
+            <div><span style="background:#FFA500"></span>High Power</div>
+            <div><span style="background:#FF6A00"></span>Very High Power</div>
+            <div><span style="background:#FF0000"></span>Extreme Power</div>
+            <div><span style="background:whitesmoke"></span>Data Center</div>
         `;
     }
 }
@@ -981,22 +951,19 @@ async function loadAQIHeatmap(selectedState = "all", aggregationLevel = "point")
             }
         } else {
             // --- POINT PLOTTING (Markers with gradient color based on max AQI) ---
+// --- POINT PLOTTING (Markers with fixed 4-category colors) ---
 let dataToPlot = filteredData;
 if (!dataToPlot.length) return;
 
-// Calculate max AQI in this dataset (or fix at 50 if desired)
-const maxAqiPoint = Math.max(...dataToPlot.map(m => parseFloat(m.aqi) || 0), 1);
-
-// Define 4 color categories
+// Define 4 fixed color categories
 const colors = ["#00ff00", "#ffff00", "#ffa500", "#ff0000"]; // green → yellow → orange → red
 
 // Determine category based on AQI value
 function getColorByCategory(aqi) {
-    const step = maxAqiPoint / 4; // 4 categories
-    if (aqi <= step) return colors[0];
-    if (aqi <= 2 * step) return colors[1];
-    if (aqi <= 3 * step) return colors[2];
-    return colors[3];
+    if (aqi <= 5) return colors[0];       // 0–5
+    if (aqi <= 15) return colors[1];      // 6–15
+    if (aqi <= 35) return colors[2];      // 16–35
+    return colors[3];                      // 36+
 }
 
 // Plot each monitor
