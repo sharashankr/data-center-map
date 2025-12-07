@@ -27,24 +27,50 @@ SCENARIO_DATA = []
 app = Flask(__name__)
 CORS(app)
 
-# --- Helper: Convert concentration to AQI ---
-def get_aqi_and_color_proxy(concentration_ppm):
-    if concentration_ppm <= 0.054:
-        aqi = int(concentration_ppm / 0.054 * 50)
-        color = "green"
-    elif concentration_ppm <= 0.070:
-        aqi = 51 + int((concentration_ppm - 0.055) / (0.070 - 0.055) * 49)
-        color = "yellow"
-    elif concentration_ppm <= 0.085:
-        aqi = 101 + int((concentration_ppm - 0.071) / (0.085 - 0.071) * 49)
-        color = "orange"
-    elif concentration_ppm <= 0.105:
-        aqi = 151 + int((concentration_ppm - 0.086) / (0.105 - 0.086) * 49)
-        color = "red"
+def get_aqi_and_color(concentration, pollutant):
+    if pollutant.lower() == 'ozone':
+        # Ozone formula (ppm)
+        if concentration <= 0.054:
+            aqi = int(concentration / 0.054 * 50)
+            color = "green"
+        elif concentration <= 0.070:
+            aqi = 51 + int((concentration - 0.055) / (0.070 - 0.055) * 49)
+            color = "yellow"
+        elif concentration <= 0.085:
+            aqi = 101 + int((concentration - 0.071) / (0.085 - 0.071) * 49)
+            color = "orange"
+        elif concentration <= 0.105:
+            aqi = 151 + int((concentration - 0.086) / (0.105 - 0.086) * 49)
+            color = "red"
+        else:
+            aqi = 201 + int((concentration - 0.106) / 0.01 * 10)
+            color = "purple"
+
+    elif pollutant.lower() == 'pm2.5 - local conditions':
+        # PM2.5 formula (µg/m³)
+        if concentration <= 12.0:
+            aqi = int(concentration / 12.0 * 50)
+            color = "green"
+        elif concentration <= 35.4:
+            aqi = 51 + int((concentration - 12.1) / (35.4 - 12.1) * 49)
+            color = "yellow"
+        elif concentration <= 55.4:
+            aqi = 101 + int((concentration - 35.5) / (55.4 - 35.5) * 49)
+            color = "orange"
+        elif concentration <= 150.4:
+            aqi = 151 + int((concentration - 55.5) / (150.4 - 55.5) * 49)
+            color = "red"
+        elif concentration <= 250.4:
+            aqi = 201 + int((concentration - 150.5) / (250.4 - 150.5) * 99)
+            color = "purple"
+        else:
+            aqi = 301 + int((concentration - 250.5) / (500 - 250.5) * 199)
+            color = "maroon"
     else:
-        aqi = 201 + int((concentration_ppm - 0.106) / 0.01 * 10)
-        color = "purple"
+        aqi, color = None, None
+
     return max(1, aqi), color
+
 
 # --- Load AQI monitor data ---
 def load_monitor_data():
@@ -85,7 +111,7 @@ def load_monitor_data():
                 pollutant = row[pollutant_idx].lower()
                 # *** ADDED: Retrieve the state name
                 state = row[state_name_idx] 
-                aqi, color = get_aqi_and_color_proxy(conc)
+                aqi, color = get_aqi_and_color(conc, pollutant)
                 
                 MONITOR_DATA.append({
                     "lat": lat,
