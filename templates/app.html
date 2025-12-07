@@ -259,27 +259,19 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 </style>
 
 <div id="about-overlay">
-    <div id="about-overlay">
-    <h2>Introduction</h2>
-    <p>
-        [Placeholder Content] This section will be updated with the finalized introductory text and context for the map layers. 
-        <br><br>
-        **Action Required:** We need to update this content once Eesha provides the final copy.
-    </p>
+        <h2>About the Data Center Environmental Impact Map</h2>
+        <p>This application is designed to provide a visualization of the environmental factors associated with data center operations across the United States. We aim to highlight regional differences and major impact categories to facilitate informed analysis.</p>
 
-    <h3>Data Layers Explained</h3>
-    <p>The map contains four primary environmental layers and one aggregate view:</p>
-    <ul>
-        <li><strong>Air Quality (AQI)</strong></li>
-        <li><strong>Water Footprint ($\text{m}^3/\text{MWh}$)</strong></li>
-        <li><strong>Power Consumption (MWh)</strong></li>
-        <li><strong>CO₂ Emissions ($\text{kg}/\text{MWh}$)</strong></li>
-        <li><strong>Data Centers Summary (Dashboard)</strong></li>
-    </ul>
+        <h3>Data Layers Explained</h3>
+        <p><strong>Air Quality:</strong> Displays real-time and historical Air Quality Index (AQI) data from EPA monitoring sites, contextualized with data center locations.</p>
+        <p><strong>Water:</strong> Visualizes the water footprint of power generation facilities that supply data centers, using metrics like $\text{m}^3/\text{MWh}$.</p>
+        <p><strong>Power:</strong> Illustrates total electrical consumption (MWh) by power facilities, allowing analysis of high-demand areas.</p>
+        <p><strong>CO₂:</strong> Shows the carbon footprint ($\text{kg}/\text{MWh}$) of electricity generation sources, critical for assessing climate impact.</p>
+        <p><strong>Data Centers Summary:</strong> Provides a non-map-based dashboard with aggregate statistics on data center status, operators, and size distribution.</p>
 
-    <h3>How to Use</h3>
-    <p>Navigate between environmental layers using the ribbon above. Use the specific filters provided on the right-hand side for the Water, Power, and CO₂ layers to refine the data aggregation and regional view.</p>
-</div>
+        <h3>How to Use</h3>
+        <p>Navigate between environmental layers using the ribbon above. Use the filters on the right (State, Fuel, PCA, Aggregation) to refine the map view in the Water, Power, and CO₂ layers.</p>
+    </div>
 </div>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
