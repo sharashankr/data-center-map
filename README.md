@@ -94,28 +94,11 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
 - Timezone handling via `pytz` :contentReference[oaicite:4]{index=4}  
 
 
-## 📁 Project Structure
-
-```text
-data-center-map/
-├── app.html                   # Main single-page frontend (Leaflet + Chart.js UI)
-├── backend.py                 # Flask backend serving API endpoints
-├── requirements.txt           # Python dependencies
-├── Procfile                   # Process definition for gunicorn/Render/Heroku deployment
-├── OZ_PM_AQI.csv              # AQI / monitor input data
-├── annual_conc_by_monitor_2025.csv
-├── final_footprint_dataset (2).csv
-├── updated_data_file.csv
-├── data/                      # (Optional) Additional data files / preprocessed datasets
-└── templates/                 # (If used) HTML templates for Flask
-'''
-
 ## Getting Started (Local Development)
 
 Clone the repository:
-```bash
 git clone https://github.com/sharashankr/data-center-map.git
-cd data-center-map
+cd data-center-map 
 
 Create and activate a virtual environment:
 python -m venv .venv
@@ -144,3 +127,5 @@ Then visit:
 http://127.0.0.1:8000/app.html
 
 Make sure the frontend API URLs match your backend environment.
+
+
