@@ -387,34 +387,124 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
         const closeBtn = document.getElementById('close-info-box');
 
         const layerInfo = {
-            Air: `<div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
-                        <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
-                        <div><strong>Data Center Layer:</strong> Click on a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
-                        <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>`,
-           Water: `<div><strong>Water Footprint Layer Overview:</strong> The Water Footprint layer visualizes the water usage intensity (m³/MWh) associated with power generation across different locations.</div>
-  <div><strong>Map Markers:</strong> Color and size of each marker indicate the water footprint — darker colors and larger circles represent a higher footprint. Hover over any circle to see the exact water footprint value (m³/MWh).</div>
-  <div><strong>More Insights Panel:</strong> The left-hand side includes deeper analysis through interactive charts:</div>
-  <div style="margin-left:16px;">
-      1. <strong>Fuel Type Analysis</strong> – Shows how water footprint varies by primary fuel type.<br>
-      2. <strong>Subbasin Analysis</strong> – Breaks down footprint across subbasins to reveal regional variations.<br>
-      3. <strong>Water Projection Analysis</strong> – Displays best- and worst-case scenarios for future water usage.
-  </div>
-  <div><strong>Interactive Graphs:</strong> All charts are interactive—hover over any point to see tooltips. Charts open in the center of the screen when selected from the insights list.</div>
-`,
-            Power: `<div><strong>Power Consumption Layer Overview:</strong> The Power Layer visualizes the total electricity consumption (MWh) by power facilities across different locations.</div>
-  <div><strong>Map Markers:</strong> Color and size of markers indicate power consumption — larger, darker markers represent higher MWh values. Hover over any circle to see the power consumption.</div>
-  <div><strong>Filter Controls:</strong> Use the State, Fuel, and PCA filters on the right to narrow down the view, and the aggregation filter to switch between individual facilities or state averages.</div>
-  <div><strong>Data Center Interaction:</strong> Click on a data center to view operational and environmental details.</div>`,
-            CO2: `<div><strong>CO₂ Emissions Layer Overview:</strong> The CO₂ Layer visualizes the carbon footprint (kg/MWh) of power facilities.</div>
-  <div><strong>Map Markers:</strong> Marker size and color scale with the CO₂ footprint. Hover to see the specific CO₂ value (kg/MWh).</div>
-  <div><strong>More Insights Panel:</strong> The left-hand side includes charts for deeper analysis:</div>
-  <div style="margin-left:16px;">
-      1. <strong>Fuel Type Analysis</strong> – Shows how CO₂ footprint varies by primary fuel type.<br>
-      2. <strong>Carbon Projection Analysis</strong> – Displays best- and worst-case scenarios for future CO₂ emissions.
-  </div>
-  <div><strong>Filter Controls:</strong> Use the State, Fuel, and PCA filters to narrow down the view, and the aggregation filter to switch between individual facilities or state averages.</div>`
-        };
+  Air: `
+    <div><strong>What this map shows:</strong> Air quality Index based on monitored pollutants (Ozone, PM, PM2.5) across the United States.</div>
+    <div>Color interpretations are shown on the left side of the map.</div>
+    <div>White icons depict data centers. Size of the icons represents data center size.</div>
 
+    <div style="margin-top:8px;"><strong>View options (top-right dropdown):</strong></div>
+    <div style="margin-left:16px;">
+      • <strong>Plot by Facility</strong> – View individual facilities sized and colored by AQI.<br>
+      • <strong>Plot by State Average</strong> – View each state colored by its average AQI, for easy state-to-state comparison.
+    </div>
+
+    <div style="margin-top:8px;"><strong>How to interact:</strong></div>
+    <div style="margin-left:16px;">
+      • Hover on the dots to view AQI values.<br>
+      • Use the “Monitor Layer” panel to switch between pollutants:<br>
+      <div style="margin-left:16px;">
+        – Ozone and PM2.5 combined<br>
+        – Ozone only<br>
+        – PM2.5 only
+      </div>
+      • Zoom and pan to analyze effects on a granular level.
+    </div>
+  `,
+
+  Water: `
+    <div><strong>What this map shows:</strong> Water footprint associated with electricity + cooling needs of data centers.</div>
+    <div>Color interpretations are shown on the left side of the map.</div>
+    <div>White icons depict data centers. Size of icons represents data center size.</div>
+
+    <div style="margin-top:8px;"><strong>View options (top-right dropdown):</strong></div>
+    <div style="margin-left:16px;">
+      • <strong>State</strong> – View all states (default) or select one state.<br>
+      • <strong>Fuel</strong> – Filter by energy source (gas, coal, hydro, solar).<br>
+      • <strong>PCA</strong> – Filter by Power Control Area.<br>
+      • <strong>Plot by Facility</strong> – View individual facilities sized and colored by water footprint.<br>
+      • <strong>Plot by State Average</strong> – View each state colored by its average water emission, for easy state-to-state comparison.
+    </div>
+
+    <div style="margin-top:8px;"><strong>How to interact:</strong></div>
+    <div style="margin-left:16px;">
+      • Hover on dots to view water footprint (m³/MWh).<br>
+      • Zoom and pan to analyze effects on a granular level.
+    </div>
+
+    <div style="margin-top:8px;"><strong>Additional analysis:</strong></div>
+    <div style="margin-left:16px;">
+      Use the “More Insights” tab to view:<br>
+      <div style="margin-left:16px;">
+        • <strong>Fuel Type </strong> – Highlights which energy sources consume the most water.<br>
+        • <strong>Water Projections</strong> – Shows how future footprint changes if most efficient or least efficient water practices are adopted.
+      </div>
+    </div>
+  `,
+
+  Power: `
+    <div><strong>What this map shows:</strong> Total electricity consumption (MWh) by power facilities.</div>
+    <div>Color interpretations are shown on the left-hand side of the map.</div>
+    <div>White icons depict data centers. Size of icons represents data center size</div>
+
+    <div style="margin-top:8px;"><strong>View options (top-right dropdown):</strong></div>
+    <div style="margin-left:16px;">
+      • <strong>State</strong> – View all states (default) or select one state.<br>
+      • <strong>Fuel</strong> – Filter by energy source(gas, coal, hydro, solar).<br>
+      • <strong>PCA</strong> – Filter by Power Control Area.<br>
+      • <strong>Plot by Facility</strong> – View individual facilities sized and colored by power footprint.<br>
+      • <strong>Plot by State Average</strong> – View each state colored by its average power emission, for easy state-to-state comparison.
+    </div>
+
+    <div style="margin-top:8px;"><strong>How to interact:</strong></div>
+    <div style="margin-left:16px;">
+      • Hover markers to view:<br>
+      <div style="margin-left:16px;">
+        – Electricity consumption (MWh)<br>
+        – Primary generation fuel<br>
+        – Sub-basin supplying electricity
+      </div>
+      • Zoom and pan to analyze effects on a granular level.
+    </div>
+  `,
+
+  CO2: `
+    <div><strong>What this map shows:</strong> Carbon footprint (kg/MWh) from electricity used by data centers.</div>
+    <div>Color interpretations are visible on the left side.</div>
+    <div>White icons depict data centers. Size of icons represents data center size.</div>
+
+    <div style="margin-top:8px;"><strong>View options (top-right dropdown):</strong></div>
+    <div style="margin-left:16px;">
+      • <strong>State</strong> – View all states or select one state.<br>
+      • <strong>Fuel</strong> – Filter by enerrgy source (gas, coal, hydro, solar).<br>
+      • <strong>PCA</strong> – Filter by Power Control Area.<br>
+      • <strong>Plot by Facility</strong> – View individual facilities sized and colored by Carbon footprint.<br>
+      • <strong>Plot by State Average</strong> – View each state colored by its average carbon emission, for easy state-to-state comparison.
+    </div>
+    </div>
+
+    <div style="margin-top:8px;"><strong>How to interact:</strong></div>
+    <div style="margin-left:16px;">
+      • Hover hotspots to view:<br>
+      <div style="margin-left:16px;">
+        – CO₂ emissions (kg/MWh)<br>
+        – Regional subbasin<br>
+        – Primary generation fuel
+      </div>
+      • Zoom and pan to analyze effects on a granular level.
+    </div>
+
+    <div style="margin-top:8px;"><strong>Additional analysis available:</strong></div>
+    <div style="margin-left:16px;">
+      Use the “More Insights” tab to view:<br>
+      <div style="margin-left:16px;">
+        • <strong>Fuel Type </strong> – Highlights which enegry source contributes the most to carbon emissions <br>
+        • <strong>Carbon Projections</strong> – Estimates future emissions if most efficient or least efficient carbon consmption practices are adopted.
+      </div>
+    </div>
+  `
+};
+
+    
         // **Step 1: Define the function globally**
 // Place this function *before* the updateInfoBox function or at the start of your main script block.
 
