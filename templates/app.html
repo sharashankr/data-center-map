@@ -956,43 +956,43 @@ async function loadAQIHeatmap(selectedState = "all", aggregationLevel = "point")
                 console.error("renderStateChoroplethAQI is not defined! Cannot draw state polygons.");
             }
         } else {
-            // **B. POINT PLOTTING (Original Marker Logic)**
+            // --- POINT PLOTTING (Markers with gradient color based on max AQI) ---
+let dataToPlot = filteredData;
+if (!dataToPlot.length) return;
 
-            let dataToPlot = filteredData;
-            if (!dataToPlot.length) return;
+// Calculate max AQI in this dataset
+const maxAqiPoint = Math.max(...dataToPlot.map(m => parseFloat(m.aqi) || 0), 1);
 
-            // Recalculate max AQI for point visualization (though colors use fixed tiers)
-            const maxAqiPoint = Math.max(...dataToPlot.map(m => parseFloat(m.aqi) || 0), 1);
+// Helper: interpolate color from green to red based on relative AQI
+function getColorFromValue(value, max) {
+    const ratio = Math.min(value / max, 1); // normalize 0-1
+    const r = Math.floor(0 + ratio * (255 - 0)); // red: 0 → 255
+    const g = Math.floor(255 - ratio * 255);     // green: 255 → 0
+    const b = 0;                                 // blue fixed at 0
+    return `rgb(${r},${g},${b})`;
+}
 
-            dataToPlot.forEach(m => {
-                const aqi = m.aqi;
+// Plot each monitor
+dataToPlot.forEach(m => {
+    const aqi = parseFloat(m.aqi) || 0;
+    const color = getColorFromValue(aqi, maxAqiPoint);
 
-                // --- Color scale based on AQI (Original Style) ---
-                let color = "green";
-                if (aqi > 50)  color = "yellow";
-                if (aqi > 100) color = "orange";
-                if (aqi > 150) color = "red";
-                if (aqi > 200) color = "purple";
-                if (aqi > 300) color = "#7E0023";
+    const marker = L.circleMarker([m.lat, m.lon], {
+        radius: 5,           // fixed size
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.85,
+        weight: 1
+    })
+    .addTo(map)
+    .bindTooltip(`AQI: ${aqi}`, {
+        direction: 'top',
+        className: 'aqi-tooltip'
+    });
 
-                // --- Smaller Size scale (Original Style) ---
-                const size = Math.min(5, Math.max(1, aqi / 60));
+    aqiMarkers.push(marker);
+});
 
-                const marker = L.circleMarker([m.lat, m.lon], {
-                    radius: size,
-                    color: color,
-                    fillColor: color,
-                    fillOpacity: 0.85,
-                    weight: 1
-                })
-                .addTo(map)
-                .bindTooltip(`AQI: ${aqi}`, {
-                    direction: 'top',
-                    className: 'aqi-tooltip'
-                });
-
-                aqiMarkers.push(marker);
-            });
         }
 
 
