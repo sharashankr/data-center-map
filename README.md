@@ -1,4 +1,4 @@
-# Data Center Environmental Impact Map
+# Environmental Risk Around US Data Centers 
 
 An interactive web application that visualizes the environmental impact of data centers across the United States.
 
