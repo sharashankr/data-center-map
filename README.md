@@ -96,8 +96,13 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
 ## Getting Started (Local Development)
 
 Clone the repository:
-git clone https://github.com/sharashankr/data-center-map.git
-cd data-center-map 
+<pre>
+  ```bash 
+  git clone https://github.com/sharashankr/data-center-map.git
+  cd data-center-map  
+ ```
+</pre>
+
 
 Create and activate a virtual environment:
 python -m venv .venv
