@@ -4,6 +4,8 @@ An interactive web application that visualizes the environmental impact of data 
 
 The app combines **air quality**, **water footprint**, **power consumption**, and **carbon emissions** with **data center locations** to help users explore how digital infrastructure interacts with local environmental conditions.
 
+View it here:  https://data-center-map-nu1d.onrender.com/
+
 
 ## 🚀 Features
 
