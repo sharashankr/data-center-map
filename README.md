@@ -4,7 +4,6 @@ An interactive web application that visualizes the environmental impact of data 
 
 The app combines **air quality**, **water footprint**, **power consumption**, and **carbon emissions** with **data center locations** to help users explore how digital infrastructure interacts with local environmental conditions. :contentReference[oaicite:0]{index=0}
 
----
 
 ## 🚀 Features
 
@@ -21,7 +20,6 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
   - Use the **Monitor Layer** panel to switch between Ozone + PM2.5, Ozone only, and PM2.5 only.
   - Zoom and pan to inspect pollution around specific data centers.
 
----
 
 ### 💧 Water Footprint Layer (Water)
 - Shows **water footprint (m³/MWh)** associated with the electricity and cooling requirements of data centers.
@@ -36,7 +34,6 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
   - **Best vs Worst Water Projections** – how future footprint changes under efficient vs inefficient practices.
   - **Fuel Type Breakdown** – which electricity sources drive the highest water consumption.
 
----
 
 ### ⚡ Power Consumption Layer (Power)
 - Visualizes **total electricity consumption (MWh)** by power facilities feeding data centers.
@@ -49,7 +46,6 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
   - Primary fuel type
   - Regional sub-basin supplying electricity.
 
----
 
 ### 🌍 CO₂ Emissions Layer (CO2)
 - Maps **carbon emissions (kg/MWh)** from electricity used by data centers.
@@ -65,7 +61,6 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
   - **Best vs Worst Carbon Projections** – scenario analysis of decarbonization vs business-as-usual.
   - **Fuel Type Contribution** – CO₂ emissions contribution by electricity source.
 
----
 
 ### 🏢 Data Centers Overlay & Summary
 - White icons on the map mark **data center locations**; icon size reflects **facility size**.
@@ -79,7 +74,6 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
   - Status (e.g., operational, planned) :contentReference[oaicite:1]{index=1}
 - A separate **Data Centers Summary** view shows aggregated charts (status breakdown, states, operators, size buckets, etc.).
 
----
 
 ## 🧱 Tech Stack
 
@@ -99,7 +93,6 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
 - [pandas](https://pandas.pydata.org/) and [NumPy](https://numpy.org/) for preprocessing and aggregation  
 - Timezone handling via `pytz` :contentReference[oaicite:4]{index=4}  
 
----
 
 ## 📁 Project Structure
 
@@ -115,3 +108,38 @@ data-center-map/
 ├── updated_data_file.csv
 ├── data/                      # (Optional) Additional data files / preprocessed datasets
 └── templates/                 # (If used) HTML templates for Flask
+
+## Getting Started (Local Development)
+
+Clone the repository:
+```bash
+git clone https://github.com/sharashankr/data-center-map.git
+cd data-center-map
+
+Create and activate a virtual environment:
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
+
+Install Dependencies:
+pip install -r requirements.txt
+
+Run the backend server:
+python backend.py
+
+Backend will start on http://127.0.0.1:5000
+
+Open the frontend:
+
+Option A – Served from Flask (if configured):
+http://127.0.0.1:5000/
+
+Option B – Serve app.html statically:
+python -m http.server 8000
+
+Then visit:
+http://127.0.0.1:8000/app.html
+
+Make sure the frontend API URLs match your backend environment.
