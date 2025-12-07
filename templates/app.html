@@ -1183,37 +1183,37 @@ async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", sel
         } else {
             // **B. POINT PLOTTING (Original Circle Logic)**
             let dataToPlot = filteredData.map(p => ({
-                ...p,
-                water_footprint: parseFloat(p.water_footprint) || 0,
-                label: `Water footprint: ${parseFloat(p.water_footprint).toFixed(2)} m³/MWh`,
-                lat: parseFloat(p.lat) || 0,
-                lon: parseFloat(p.lon) || 0,
-            }));
+    ...p,
+    water_footprint: parseFloat(p.water_footprint) || 0,
+    label: `Water footprint: ${parseFloat(p.water_footprint).toFixed(2)} m³/MWh`,
+    lat: parseFloat(p.lat) || 0,
+    lon: parseFloat(p.lon) || 0,
+}));
 
-            waterMarkers = [];
-            dataToPlot.forEach(p => {
-                const footprint = p.water_footprint;
-                const intensity = Math.min(footprint / maxFootprint, 1.0);
-                const baseRadius = 4 + intensity * 12;
+waterMarkers = [];
+dataToPlot.forEach(p => {
+    const footprint = p.water_footprint;
+    
+    // Color based on intensity (optional, can keep same logic)
+    const intensity = Math.min(footprint / maxFootprint, 1.0);
+    const color = intensity < 0.2 ? '#3B82F6' :
+                  intensity < 0.4 ? '#0EA5E9' :
+                  intensity < 0.6 ? '#06B6D4' :
+                  intensity < 0.8 ? '#22C55E' :
+                  '#F87171';
 
-                const color = intensity < 0.2 ? '#3B82F6' :
-                               intensity < 0.4 ? '#0EA5E9' :
-                               intensity < 0.6 ? '#06B6D4' :
-                               intensity < 0.8 ? '#22C55E' :
-                               '#F87171';
+    const circle = L.circleMarker([p.lat, p.lon], {
+        radius: 5,           // constant size for all markers
+        color,
+        fillColor: color,
+        fillOpacity: 0.5,
+        weight: 1,
+        pane: 'markerPane'
+    }).addTo(map);
 
-                const circle = L.circleMarker([p.lat, p.lon], {
-                    radius: baseRadius,
-                    color,
-                    fillColor: color,
-                    fillOpacity: 0.5,
-                    weight: 1,
-                    pane: 'markerPane'
-                }).addTo(map);
-
-                circle.bindTooltip(p.label, { direction: 'top' });
-                waterMarkers.push({ circle, baseRadius, intensity });
-            });
+    circle.bindTooltip(p.label, { direction: 'top' });
+    waterMarkers.push({ circle, intensity });
+});
         }
 
 
