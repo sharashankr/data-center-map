@@ -798,18 +798,13 @@ if (aggregationSelect) {
 // Global variable to store the choropleth layer for AQI
 let aqiChoroplethLayer = null;
 
-// AQI Color Helper (Dynamic 4-category coloring based on max AQI)
-function getChoroplethAQIColor(aqiValue, maxAqi) {
-    if (!maxAqi || maxAqi <= 0) return '#E0E7FF'; // Default/No data
-
-    const step = maxAqi / 4; // Divide into 4 equal categories
-
-    if (aqiValue <= step) return 'green';       // Category 1
-    if (aqiValue <= 2 * step) return 'yellow'; // Category 2
-    if (aqiValue <= 3 * step) return 'orange'; // Category 3
-    return 'red';                               // Category 4
+// AQI Color Helper (4 fixed categories)
+function getChoroplethAQIColor(aqiValue) {
+    if (aqiValue <= 5) return 'green';       // 0–5
+    if (aqiValue <= 15) return 'yellow';     // 6–15
+    if (aqiValue <= 35) return 'orange';     // 16–35
+    return 'red';                            // 36+
 }
-
 
 // Dedicated function to clear AQI layers (must be called by clearHeatLayer)
 function clearAQILayer() {
