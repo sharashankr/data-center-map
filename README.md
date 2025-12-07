@@ -2,7 +2,7 @@
 
 An interactive web application that visualizes the environmental impact of data centers across the United States.
 
-The app combines **air quality**, **water footprint**, **power consumption**, and **carbon emissions** with **data center locations** to help users explore how digital infrastructure interacts with local environmental conditions. :contentReference[oaicite:0]{index=0}
+The app combines **air quality**, **water footprint**, **power consumption**, and **carbon emissions** with **data center locations** to help users explore how digital infrastructure interacts with local environmental conditions.
 
 
 ## 🚀 Features
@@ -108,6 +108,7 @@ data-center-map/
 ├── updated_data_file.csv
 ├── data/                      # (Optional) Additional data files / preprocessed datasets
 └── templates/                 # (If used) HTML templates for Flask
+'''
 
 ## Getting Started (Local Development)
 
