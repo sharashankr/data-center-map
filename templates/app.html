@@ -262,18 +262,11 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
         <h2>About the Data Center Environmental Impact Map</h2>
         <p>This application is designed to provide a visualization of the environmental factors associated with data center operations across the United States. We aim to highlight regional differences and major impact categories to facilitate informed analysis.</p>
 
-        <h3>Data Layers Explained</h3>
-        <p><strong>Air Quality:</strong> Displays real-time and historical Air Quality Index (AQI) data from EPA monitoring sites, contextualized with data center locations.</p>
-        <p><strong>Water:</strong> Visualizes the water footprint of power generation facilities that supply data centers, using metrics like $\text{m}^3/\text{MWh}$.</p>
-        <p><strong>Power:</strong> Illustrates total electrical consumption (MWh) by power facilities, allowing analysis of high-demand areas.</p>
-        <p><strong>CO₂:</strong> Shows the carbon footprint ($\text{kg}/\text{MWh}$) of electricity generation sources, critical for assessing climate impact.</p>
-        <p><strong>Data Centers Summary:</strong> Provides a non-map-based dashboard with aggregate statistics on data center status, operators, and size distribution.</p>
 
-        <h3>How to Use</h3>
         <p>Navigate between environmental layers using the ribbon above. Use the filters on the right (State, Fuel, PCA, Aggregation) to refine the map view in the Water, Power, and CO₂ layers.</p>
     </div>
 </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -703,7 +696,7 @@ btn.addEventListener('click', () => {
             center: [39.5, -98.35],  // center of continental US
             zoom: startZoom,          // starting zoom
             minZoom: startZoom        // restrict zoom out to starting zoom
-            
+
         });
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -1242,7 +1235,7 @@ async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", sel
 waterMarkers = [];
 dataToPlot.forEach(p => {
     const footprint = p.water_footprint;
-    
+
     // Color based on intensity (optional, can keep same logic)
     const intensity = Math.min(footprint / maxFootprint, 1.0);
     const color = intensity < 0.2 ? '#3B82F6' :
@@ -2479,36 +2472,45 @@ filteredForPlot.forEach(p => {
         }
         // ---- Layer Switcher (FIXED) ----
 // ---- Layer Switcher (FIXED to handle map visibility) ----
+// ---- Layer Switcher (FIXED to handle all controls/map visibility) ----
 function loadLayer(layer) {
     // 1. Clear ALL old layers first
     clearHeatLayer();
 
-    // 2. Hide all overlays and conditionally show the map
+    // 2. Element references
     const mapElement = document.getElementById('map');
     const summaryOverlay = document.getElementById('summary-overlay');
     const aboutOverlay = document.getElementById('about-overlay');
+    const aggFilter = document.getElementById('aggregation-filter'); // Reference the filter
 
-    // Hide both overlays
+    // Hide both main overlays immediately
     if (summaryOverlay) summaryOverlay.style.display = 'none';
     if (aboutOverlay) aboutOverlay.style.display = 'none';
 
     if (layer === "summary" || layer === "about") {
-        // Non-map layer: Hide map, hide controls
+        // Non-map layer: Hide map, hide controls (including filters)
         if (mapElement) mapElement.style.display = 'none';
         hideMapControls();
+        // The filter is hidden via hideMapControls()
+
     } else {
-        // Map layer (air, water, power, co2): Show map, show controls (panels will handle specifics)
+        // Map layer (air, water, power, co2): Show map, conditionally show controls
         if (mapElement) mapElement.style.display = 'block';
-        // Note: showPanelsFor(layer) is already called outside this function and will restore controls/filters for map layers.
+
+
+        if (aggFilter) {
+            aggFilter.style.display = 'block';
+        }
+        // showPanelsFor(layer) is also called below and will handle other filters/panels
     }
-    
+
     // 3. Get the current aggregation setting from the dropdown
     const aggregationLevel = getAggregationLevel();
 
     // 4. Load the selected layer
     switch (layer) {
+        // ... (rest of the switch statement remains the same)
         case "about":
-            // Show the specific overlay
             if (aboutOverlay) aboutOverlay.style.display = 'block';
             break;
         case "water":
@@ -2524,7 +2526,6 @@ function loadLayer(layer) {
             loadPowerHeatmap("all", "all", "all", aggregationLevel);
             break;
         case "summary":
-            // Show the specific overlay
             if (summaryOverlay) summaryOverlay.style.display = 'block';
             loadDataCenterSummary();
             break;
@@ -2542,6 +2543,12 @@ function loadLayer(layer) {
             document.getElementById('subbasin-filter').style.display = 'none';
             document.getElementById('dc-info-tab').style.display = 'none';
             // document.getElementById('aggregation-filter').style.display = 'none';
+
+            // 💡 FIX: Hide the aggregation filter
+    const aggFilter = document.getElementById('aggregation-filter');
+    if (aggFilter) {
+        aggFilter.style.display = 'none';
+    }
         }
 
         function showMapControls() {
