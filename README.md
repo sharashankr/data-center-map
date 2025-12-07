@@ -141,7 +141,7 @@ http://127.0.0.1:8000/app.html
 
 Make sure the frontend API URLs match your backend environment.
 
-### Data Sources & Assumptions
+## Data Sources & Assumptions
 
 AQI datasets:
 
