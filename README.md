@@ -71,14 +71,14 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
   - Cooling source
   - City, state
   - Project cost
-  - Status (e.g., operational, planned) :contentReference[oaicite:1]{index=1}
+  - Status (e.g., operational, planned) 
 - A separate **Data Centers Summary** view shows aggregated charts (status breakdown, states, operators, size buckets, etc.).
 
 
 ## 🧱 Tech Stack
 
 **Frontend**
-- Plain HTML, CSS, and JavaScript (single-page app in `app.html`) :contentReference[oaicite:2]{index=2}  
+- Plain HTML, CSS, and JavaScript (single-page app in `app.html`) 
 - [Leaflet](https://leafletjs.com/) for interactive mapping and layers  
 - [Tailwind CSS](https://tailwindcss.com/) + [DaisyUI](https://daisyui.com/) for UI styling  
 - [Chart.js](https://www.chartjs.org/) for summary and “More Insights” charts  
@@ -86,13 +86,12 @@ The app combines **air quality**, **water footprint**, **power consumption**, an
 **Backend**
 - [Flask](https://flask.palletsprojects.com/) web framework  
 - [flask-cors](https://flask-cors.readthedocs.io/) for CORS handling  
-- [gunicorn](https://gunicorn.org/) for production serving (via `Procfile`) :contentReference[oaicite:3]{index=3}  
+- [gunicorn](https://gunicorn.org/) for production serving (via `Procfile`)  
 
 **Data & Processing**
 - CSV data files for monitors and environmental metrics (e.g. AQI, water footprint, power usage)
 - [pandas](https://pandas.pydata.org/) and [NumPy](https://numpy.org/) for preprocessing and aggregation  
-- Timezone handling via `pytz` :contentReference[oaicite:4]{index=4}  
-
+- Timezone handling via `pytz` 
 
 ## Getting Started (Local Development)
 
