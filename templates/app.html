@@ -2122,7 +2122,7 @@ filteredForPlot.forEach(p => {
                     });
                     // Display total number of data centers
                     const totalCount = status_counts.reduce((sum, d) => sum + (typeof d.count === 'number' ? d.count : 0), 0);
-                    document.getElementById('total-dc-count').innerText = `Total Data Centers: ${totalCount}`;
+                    document.getElementById('total-dc-count').innerText = `Total Known Data Centers: ${totalCount}`;
                 } else {
                     document.getElementById('plot-status').parentElement.innerHTML = '<div class="grid-box" style="color:#fff; text-align:center;">No Status data available.</div>';
                 }
@@ -2146,7 +2146,7 @@ filteredForPlot.forEach(p => {
                             indexAxis: 'y',
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { display: false }, title: { display:true, text:'States with Most Data Centers', color: '#fff' } },
+                            plugins: { legend: { display: false }, title: { display:true, text:'States with Most Known Data Centers', color: '#fff' } },
                             scales: {
                                 x: {
                                     ticks: { color: '#fff' },
@@ -2211,7 +2211,7 @@ filteredForPlot.forEach(p => {
                             },
                             plugins: {
                                 legend: { display:false },
-                                title: { display:true, text:'Top 10 Data Center Operators in the US', color: '#fff' }
+                                title: { display:true, text:'Top 10 Known Data Center Operators in the US', color: '#fff' }
                             },
                             scales: {
                                 x: {
@@ -2293,7 +2293,7 @@ filteredForPlot.forEach(p => {
                                 },
                                 plugins: {
                                     legend: { display: false },
-                                    title: { display: true, text: 'Data Center Size Distribution', color: '#fff' },
+                                    title: { display: true, text: 'Known Data Center Size Distribution', color: '#fff' },
                                     tooltip: {
                                         callbacks: {
                                             title: function(context) {
