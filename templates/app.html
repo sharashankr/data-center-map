@@ -960,22 +960,25 @@ async function loadAQIHeatmap(selectedState = "all", aggregationLevel = "point")
 let dataToPlot = filteredData;
 if (!dataToPlot.length) return;
 
-// Calculate max AQI in this dataset
+// Calculate max AQI in this dataset (or fix at 50 if desired)
 const maxAqiPoint = Math.max(...dataToPlot.map(m => parseFloat(m.aqi) || 0), 1);
 
-// Helper: interpolate color from green to red based on relative AQI
-function getColorFromValue(value, max) {
-    const ratio = Math.min(value / max, 1); // normalize 0-1
-    const r = Math.floor(0 + ratio * (255 - 0)); // red: 0 → 255
-    const g = Math.floor(255 - ratio * 255);     // green: 255 → 0
-    const b = 0;                                 // blue fixed at 0
-    return `rgb(${r},${g},${b})`;
+// Define 4 color categories
+const colors = ["#00ff00", "#ffff00", "#ffa500", "#ff0000"]; // green → yellow → orange → red
+
+// Determine category based on AQI value
+function getColorByCategory(aqi) {
+    const step = maxAqiPoint / 4; // 4 categories
+    if (aqi <= step) return colors[0];
+    if (aqi <= 2 * step) return colors[1];
+    if (aqi <= 3 * step) return colors[2];
+    return colors[3];
 }
 
 // Plot each monitor
 dataToPlot.forEach(m => {
     const aqi = parseFloat(m.aqi) || 0;
-    const color = getColorFromValue(aqi, maxAqiPoint);
+    const color = getColorByCategory(aqi);
 
     const marker = L.circleMarker([m.lat, m.lon], {
         radius: 5,           // fixed size
@@ -992,6 +995,8 @@ dataToPlot.forEach(m => {
 
     aqiMarkers.push(marker);
 });
+
+
 
         }
 
