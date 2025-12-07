@@ -259,12 +259,49 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 </style>
 
 <div id="about-overlay">
-        <h2>About the Data Center Environmental Impact Map</h2>
-        <p>This application is designed to provide a visualization of the environmental factors associated with data center operations across the United States. We aim to highlight regional differences and major impact categories to facilitate informed analysis.</p>
+    <h2>Introduction</h2>
+    <p>
+        Every time you stream a video, store a photo in the cloud, or use AI, you're relying on data centres — massive warehouses of servers that power our digital lives. But this infrastructure comes with hidden environmental costs: **energy consumption, water usage, air pollution, and carbon emissions.**
+    </p>
+    <p>
+        This platform helps you explore the environmental impact of **1,152 data centres** across the United States.
+    </p>
 
+    <h3>What You Can Do:</h3>
+    <ul>
+        <li>
+            <strong>Air Quality:</strong> See which data centres are in areas that may affect nearby communities due to poor air quality. *Red/orange markers show facilities in regions with poor air quality.*
+        </li>
+        <li>
+            <strong>Water:</strong> Discover how much water data centres consume for cooling. Some facilities use millions of gallons annually — especially concerning in drought-prone areas like California.
+        </li>
+        <li>
+            <strong>Power:</strong> View the energy sources powering each facility. *Yellow circles = low power, red = extreme power.*
+        </li>
+        <li>
+            <strong>CO₂ Emissions:</strong> Compare carbon footprints. Facilities powered by coal emit 10x more $\text{CO}_2$ than those using renewables. *Use the dropdown to compare fuel types.*
+        </li>
+        <li>
+            <strong>Summary:</strong> Get the big picture: Which states have the most data centres? Which tech companies operate the largest networks? How big are these facilities?
+        </li>
+    </ul>
 
-        <p>Navigate between environmental layers using the ribbon above. Use the filters on the right (State, Fuel, PCA, Aggregation) to refine the map view in the Water, Power, and CO₂ layers.</p>
-    </div>
+    <h3>Why This Matters:</h3>
+    <ul>
+        <li>Make informed choices about cloud providers based on their environmental footprint</li>
+        <li>Hold tech companies accountable for sustainability claims</li>
+        <li>Understand where your digital consumption impacts the physical world</li>
+        <li>Advocate for cleaner data centre infrastructure in your community</li>
+    </ul>
+
+    <h3>How to Use:</h3>
+    <ol>
+        <li>Click tabs at the top to switch between Air Quality, Water, Power, $\text{CO}_2$, and Summary views.</li>
+        <li>Use dropdown filters to focus on specific states, fuel types, or facilities.</li>
+        <li>Hover over any circle on the map for detailed information.</li>
+        <li>Zoom in/out to explore national patterns or local clusters.</li>
+    </ol>
+</div>
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
