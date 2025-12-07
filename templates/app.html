@@ -831,14 +831,13 @@ function clearAQILayer() {
 }
 
 // Choropleth Renderer for AQI
-async function renderStateChoroplethAQI(aqiData, maxAqi) {
+async function renderStateChoroplethAQI(aqiData) {
     if (aqiChoroplethLayer) {
         map.removeLayer(aqiChoroplethLayer);
         aqiChoroplethLayer = null;
     }
 
     try {
-        // Assuming US_STATES_GEOJSON_URL and stateAbbreviations are defined globally
         const res = await fetch(US_STATES_GEOJSON_URL);
         if (!res.ok) throw new Error(`Failed to load GeoJSON: ${res.status}`);
         const geojsonData = await res.json();
@@ -853,7 +852,7 @@ async function renderStateChoroplethAQI(aqiData, maxAqi) {
             const avgAqi = aqiData[dataKey] || 0;
 
             return {
-                fillColor: getChoroplethAQIColor(stateAvgAqi, maxAqiAgg);, // AQI uses fixed color scale
+                fillColor: getChoroplethAQIColor(avgAqi),
                 weight: 1.5,
                 opacity: 1,
                 color: 'white',
@@ -867,8 +866,8 @@ async function renderStateChoroplethAQI(aqiData, maxAqi) {
             const avgAqi = aqiData[dataKey];
 
             let tooltipText = `<strong>${geojsonName} (${dataKey || 'N/A'})</strong><br>`;
-            tooltipText += avgAqi ?
-                           `Avg. AQI: ${avgAqi.toFixed(0)}` : // Display as integer
+            tooltipText += avgAqi !== undefined ?
+                           `Avg. AQI: ${avgAqi.toFixed(0)}` :
                            `No monitor data available.`;
 
             layer.bindTooltip(tooltipText, { sticky: true, direction: 'center' });
@@ -879,7 +878,6 @@ async function renderStateChoroplethAQI(aqiData, maxAqi) {
             });
         }
 
-        // Create and add the GeoJSON layer to the map
         aqiChoroplethLayer = L.geoJson(geojsonData, {
             style: styleFeature,
             onEachFeature: onEachFeature
@@ -889,6 +887,7 @@ async function renderStateChoroplethAQI(aqiData, maxAqi) {
         console.error("Error rendering AQI choropleth map:", error);
     }
 }
+
 // --- Load AQI Markers or Choropleth ---
 async function loadAQIHeatmap(selectedState = "all", aggregationLevel = "point") {
     try {
