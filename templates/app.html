@@ -2478,25 +2478,38 @@ filteredForPlot.forEach(p => {
             if (overlay) overlay.remove();
         }
         // ---- Layer Switcher (FIXED) ----
+// ---- Layer Switcher (FIXED to handle map visibility) ----
 function loadLayer(layer) {
     // 1. Clear ALL old layers first
     clearHeatLayer();
 
-    // 2. Hide summary overlay if necessary
-    if (layer !== "summary") {
-        document.getElementById('summary-overlay').style.display = 'none';
-        showMapControls();
-    }
+    // 2. Hide all overlays and conditionally show the map
+    const mapElement = document.getElementById('map');
+    const summaryOverlay = document.getElementById('summary-overlay');
+    const aboutOverlay = document.getElementById('about-overlay');
 
+    // Hide both overlays
+    if (summaryOverlay) summaryOverlay.style.display = 'none';
+    if (aboutOverlay) aboutOverlay.style.display = 'none';
+
+    if (layer === "summary" || layer === "about") {
+        // Non-map layer: Hide map, hide controls
+        if (mapElement) mapElement.style.display = 'none';
+        hideMapControls();
+    } else {
+        // Map layer (air, water, power, co2): Show map, show controls (panels will handle specifics)
+        if (mapElement) mapElement.style.display = 'block';
+        // Note: showPanelsFor(layer) is already called outside this function and will restore controls/filters for map layers.
+    }
+    
     // 3. Get the current aggregation setting from the dropdown
     const aggregationLevel = getAggregationLevel();
 
     // 4. Load the selected layer
     switch (layer) {
         case "about":
-            document.getElementById('about-overlay').style.display = 'block';
-            document.getElementById('map').style.display = 'none'; // Hide the map itself
-            hideMapControls(); // Ensure all filters and panels are hidden
+            // Show the specific overlay
+            if (aboutOverlay) aboutOverlay.style.display = 'block';
             break;
         case "water":
             loadWaterHeatmap("all", "all", "all", aggregationLevel);
@@ -2505,18 +2518,17 @@ function loadLayer(layer) {
             loadAQIHeatmap("all", aggregationLevel);
             break;
         case "co2":
-            // Pass aggregationLevel
             loadCarbonHeatmap("all", "all", "all", aggregationLevel);
             break;
         case "power":
-            // Pass aggregationLevel
             loadPowerHeatmap("all", "all", "all", aggregationLevel);
             break;
         case "summary":
+            // Show the specific overlay
+            if (summaryOverlay) summaryOverlay.style.display = 'block';
             loadDataCenterSummary();
             break;
         default:
-            // Already cleared above, just keep legend clear
             break;
     }
 }
