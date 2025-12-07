@@ -10,7 +10,7 @@ from numbers_parser import Document
 
 # --- FILE CONFIGURATION ---
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-MONITOR_CSV = os.path.abspath('updated_data_file.csv')
+MONITOR_CSV = os.path.abspath('OZ_PM_AQI.csv')
 DC_CSV = os.path.abspath('data/Data_Centers_Database - Data Centers.csv')
 WATER_CSV = os.path.abspath('final_footprint_dataset (2).csv')
 CARBON_CSV = os.path.abspath('final_footprint_dataset (2).csv')
