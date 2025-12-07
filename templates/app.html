@@ -226,6 +226,62 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
         .dc-icon i { pointer-events:none; }
     </style>
+
+    <style>
+    /* Overlay for About content (similar to summary overlay) */
+    #about-overlay {
+        position: absolute;
+        top: 120px; /* Adjust to map header */
+        bottom: 0;
+        right: 0;
+        left: 0;
+        z-index: 550;
+        background: #111827;
+        display: none; /* Hidden initially */
+        padding: 40px;
+        box-sizing: border-box;
+        color: #e0e0e0;
+        overflow-y: auto;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    #about-overlay h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #6EC1E4;
+        border-bottom: 2px solid #6EC1E4;
+        padding-bottom: 5px;
+    }
+    #about-overlay p {
+        margin-bottom: 15px;
+    }
+</style>
+
+<div id="about-overlay">
+    <div id="about-overlay">
+    <h2>Introduction</h2>
+    <p>
+        [Placeholder Content] This section will be updated with the finalized introductory text and context for the map layers. 
+        <br><br>
+        **Action Required:** We need to update this content once Eesha provides the final copy.
+    </p>
+
+    <h3>Data Layers Explained</h3>
+    <p>The map contains four primary environmental layers and one aggregate view:</p>
+    <ul>
+        <li><strong>Air Quality (AQI)</strong></li>
+        <li><strong>Water Footprint ($\text{m}^3/\text{MWh}$)</strong></li>
+        <li><strong>Power Consumption (MWh)</strong></li>
+        <li><strong>CO₂ Emissions ($\text{kg}/\text{MWh}$)</strong></li>
+        <li><strong>Data Centers Summary (Dashboard)</strong></li>
+    </ul>
+
+    <h3>How to Use</h3>
+    <p>Navigate between environmental layers using the ribbon above. Use the specific filters provided on the right-hand side for the Water, Power, and CO₂ layers to refine the data aggregation and regional view.</p>
+</div>
+</div>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -234,6 +290,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
         <div id="title-ribbon">Environmental Impact of Data Centers</div>
         <div id="nav-ribbon">
             <div class="flex gap-3">
+                <div class="nav-item" data-layer="about">About</div>
                 <div class="nav-item active" data-layer="air">Air Quality</div>
                 <div class="nav-item" data-layer="water">Water</div>
                 <div class="nav-item" data-layer="power">Power</div>
@@ -2444,6 +2501,11 @@ function loadLayer(layer) {
 
     // 4. Load the selected layer
     switch (layer) {
+        case "about":
+            document.getElementById('about-overlay').style.display = 'block';
+            document.getElementById('map').style.display = 'none'; // Hide the map itself
+            hideMapControls(); // Ensure all filters and panels are hidden
+            break;
         case "water":
             loadWaterHeatmap("all", "all", "all", aggregationLevel);
             break;
