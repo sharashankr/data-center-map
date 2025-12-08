@@ -922,12 +922,12 @@ btn.addEventListener('click', () => {
 
     <script>
         const startZoom = 5;
+
         const map = L.map('map', {
             center: [39.5, -98.35],  // center of continental US
-            zoom: startZoom,          // starting zoom
-            minZoom: startZoom        // restrict zoom out to starting zoom
-
+            zoom: startZoom          // starting zoom only
         });
+
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
