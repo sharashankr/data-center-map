@@ -539,20 +539,20 @@ def data_center_summary():
         )
 
         # -------- TABLE 3: TOP 10 OPERATORS --------
-        # -------- TABLE 3: TOP 10 OPERATORS --------
+        # Normalize operator names
         operator_counts = (
             df['Operator']
             .replace(["", " ", "None", "Unknown"], pd.NA)
             .dropna()
-            .str.strip()                # remove leading/trailing spaces
-            .str.lower()                # normalize casing
+            .str.strip()
+            .str.title()   # only title-case valid entries
             .value_counts()
             .nlargest(10)
             .reset_index()
             .rename(columns={'index': 'Operator', 'Operator': 'Count'})
             .fillna(0)
         )
-        operator_counts['Operator'] = operator_counts['Operator'].str.title()
+
 
         # -------- TABLE 4: FACILITY SIZE DISTRIBUTION --------
         size_distribution = df_size_clean[['Name', 'State', 'Size_Million_sq_ft']].fillna(0)
