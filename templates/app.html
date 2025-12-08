@@ -2195,7 +2195,7 @@ filteredForPlot.forEach(p => {
     }
 });
 
-        async function loadDataCenterSummary() {
+       async function loadDataCenterSummary() {
             // 1. Hide all map-related panels and filters
             hideMapControls();
 
@@ -2229,9 +2229,9 @@ filteredForPlot.forEach(p => {
                     window.plotStatusChart = new Chart(document.getElementById('plot-status').getContext('2d'), {
                         type: 'doughnut',
                         data: {
-                            labels: status_counts.map(d => d.Status),
+                            labels: status_counts.map(d => d.Count),
                             datasets: [{
-                                data: status_counts.map(d => d.Count),
+                                data: status_counts.map(d => d.count),
                                 backgroundColor: [
                                     '#7C83FD', // muted blue
                                     '#F7B267', // muted orange
@@ -2262,7 +2262,7 @@ filteredForPlot.forEach(p => {
                     });
                     // Display total number of data centers
                     const totalCount = status_counts.reduce((sum, d) => sum + (typeof d.count === 'number' ? d.count : 0), 0);
-                    document.getElementById('total-dc-count').innerText = `Total Known Data Centers: ${totalCount}`;
+                    document.getElementById('total-dc-count').innerText = `Total Data Centers: ${totalCount}`;
                 } else {
                     document.getElementById('plot-status').parentElement.innerHTML = '<div class="grid-box" style="color:#fff; text-align:center;">No Status data available.</div>';
                 }
@@ -2272,10 +2272,10 @@ filteredForPlot.forEach(p => {
                     window.plotStatesChart = new Chart(document.getElementById('plot-states').getContext('2d'), {
                         type: 'bar',
                         data: {
-                            labels: top_states.map(d => d.State),
+                            labels: top_states.map(d => d.Count),
                             datasets: [{
                                 label: 'Facilities',
-                                data: top_states.map(d => d.Count),
+                                data: top_states.map(d => d.count),
                                 backgroundColor: [
                                     '#7C83FD', '#F7B267', '#FFD166', '#70E3B1', '#5EC8E6',
                                     '#FF70A6', '#A3A3F7', '#F7B7A3', '#F7E3A3', '#A3F7BF'
@@ -2286,7 +2286,7 @@ filteredForPlot.forEach(p => {
                             indexAxis: 'y',
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { display: false }, title: { display:true, text:'States with Most Known Data Centers', color: '#fff' } },
+                            plugins: { legend: { display: false }, title: { display:true, text:'States with Most Data Centers', color: '#fff' } },
                             scales: {
                                 x: {
                                     ticks: { color: '#fff' },
@@ -2304,8 +2304,8 @@ filteredForPlot.forEach(p => {
                 // --- Plot 3: Top Operators Lollipop (MAINTAIN ASPECT RATIO SET) ---
                 if (top_operators.length > 0) {
                     // Extract data once
-                    const counts = top_operators.map(d => d.Count);
-                    const labels = top_operators.map(d => d.Operator);
+                    const counts = top_operators.map(d => d.count);
+                    const labels = top_operators.map(d => d.Count);
 
                     // Balanced color palette for lollipop sticks and balls
                     const balancedSticks = [
@@ -2351,7 +2351,7 @@ filteredForPlot.forEach(p => {
                             },
                             plugins: {
                                 legend: { display:false },
-                                title: { display:true, text:'Top 10 Known Data Center Operators in the US', color: '#fff' }
+                                title: { display:true, text:'Top 10 Data Center Operators in the US', color: '#fff' }
                             },
                             scales: {
                                 x: {
@@ -2433,7 +2433,7 @@ filteredForPlot.forEach(p => {
                                 },
                                 plugins: {
                                     legend: { display: false },
-                                    title: { display: true, text: 'Known Data Center Size Distribution', color: '#fff' },
+                                    title: { display: true, text: 'Data Center Size Distribution', color: '#fff' },
                                     tooltip: {
                                         callbacks: {
                                             title: function(context) {
