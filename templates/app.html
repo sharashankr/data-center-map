@@ -847,14 +847,14 @@ btn.addEventListener('click', () => {
         const map = L.map('map', {
             center: [39.5, -98.35],  // center of continental US
             zoom: startZoom,          // starting zoom
-            minZoom: startZoom        // restrict zoom out to starting zoom
+            minZoom: startZoom + 1000        // restrict zoom out to starting zoom
 
         });
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
             subdomains: 'abcd',
-            maxZoom: 190000              // tile layer maxZoom
+            maxZoom: 19              // tile layer maxZoom
         }).addTo(map);
 
         let currentPollutant = "all";
