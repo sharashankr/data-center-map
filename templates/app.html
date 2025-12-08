@@ -2229,9 +2229,9 @@ filteredForPlot.forEach(p => {
                     window.plotStatusChart = new Chart(document.getElementById('plot-status').getContext('2d'), {
                         type: 'doughnut',
                         data: {
-                            labels: status_counts.map(d => d.Count),
+                            labels: status_counts.map(d => d.Status),
                             datasets: [{
-                                data: status_counts.map(d => d.count),
+                                data: status_counts.map(d => d.Count),
                                 backgroundColor: [
                                     '#7C83FD', // muted blue
                                     '#F7B267', // muted orange
@@ -2272,10 +2272,10 @@ filteredForPlot.forEach(p => {
                     window.plotStatesChart = new Chart(document.getElementById('plot-states').getContext('2d'), {
                         type: 'bar',
                         data: {
-                            labels: top_states.map(d => d.Count),
+                            labels: top_states.map(d => d.State),
                             datasets: [{
                                 label: 'Facilities',
-                                data: top_states.map(d => d.count),
+                                data: top_states.map(d => d.Count),
                                 backgroundColor: [
                                     '#7C83FD', '#F7B267', '#FFD166', '#70E3B1', '#5EC8E6',
                                     '#FF70A6', '#A3A3F7', '#F7B7A3', '#F7E3A3', '#A3F7BF'
@@ -2304,8 +2304,8 @@ filteredForPlot.forEach(p => {
                 // --- Plot 3: Top Operators Lollipop (MAINTAIN ASPECT RATIO SET) ---
                 if (top_operators.length > 0) {
                     // Extract data once
-                    const counts = top_operators.map(d => d.count);
-                    const labels = top_operators.map(d => d.Count);
+                    const counts = top_operators.map(d => d.Count);
+                    const labels = top_operators.map(d => d.Operator);
 
                     // Balanced color palette for lollipop sticks and balls
                     const balancedSticks = [
