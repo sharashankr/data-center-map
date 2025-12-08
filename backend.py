@@ -552,7 +552,7 @@ def data_center_summary():
             .rename(columns={'index': 'Operator', 'Operator': 'Count'})
             .fillna(0)
         )
-
+        operator_counts['Operator'] = operator_counts['Operator'].str.title()
 
         # -------- TABLE 4: FACILITY SIZE DISTRIBUTION --------
         size_distribution = df_size_clean[['Name', 'State', 'Size_Million_sq_ft']].fillna(0)
