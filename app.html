@@ -314,7 +314,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 <script>
 const map = L.map('map').setView([39.5, -98.35], 5.5); // Start zoomed on continental US
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-  attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:'abcd', maxZoom:19
+  attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:'abcd', maxZoom:190000
 }).addTo(map);
 
 let currentPollutant = "all";
@@ -434,7 +434,7 @@ async function loadAQIHeatmap(){
     if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; }
 
     const points = monitorData.map(m=>[m.lat, m.lon, Math.min(m.aqi/500,0.6)]);
-    heatLayer = L.heatLayer(points,{radius:15,blur:8,maxZoom:10,gradient:{0:'green',0.3:'yellow',0.6:'orange',0.8:'red',1:'purple'}}).addTo(map);
+    heatLayer = L.heatLayer(points,{radius:15,blur:8,maxZoom:100000,gradient:{0:'green',0.3:'yellow',0.6:'orange',0.8:'red',1:'purple'}}).addTo(map);
 
     // Add invisible circle markers for tooltips **only if Air layer active**
     if(currentLayer==="air"){
@@ -627,7 +627,7 @@ async function loadCarbonHeatmap() {
     heatLayer = L.heatLayer(heatPoints, {
       radius: 25,
       blur: 30,
-      maxZoom: 10,
+      maxZoom: 100000,
       gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
     }).addTo(map);
 
