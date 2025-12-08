@@ -538,17 +538,21 @@ def data_center_summary():
             .fillna(0)
         )
 
-        # -------- TABLE 3: TOP 10 OPERATORS --------
         operator_counts = (
-            df['Operator']
-            .replace(["", " ", "None", "Unknown"], pd.NA)
-            .dropna()
-            .value_counts()
-            .nlargest(10)
-            .reset_index()
-            .rename(columns={'index': 'Operator', 'Operator': 'Count'})
-            .fillna(0)
+        df['Operator']
+        .astype(str)
+        .str.strip()
+        .str.lower()                                
+        .replace(["", "none", "unknown"], pd.NA)
+        .dropna()
+        .value_counts()
+        .nlargest(10)
+        .reset_index()
+        .rename(columns={'index': 'Operator', 'Operator': 'Count'})
         )
+    
+        # Convert back to Camel/Proper Case AFTER aggregation
+        operator_counts['Operator'] = operator_counts['Operator'].str.title()
 
         # -------- TABLE 4: FACILITY SIZE DISTRIBUTION --------
         size_distribution = df_size_clean[['Name', 'State', 'Size_Million_sq_ft']].fillna(0)
