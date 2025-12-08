@@ -925,7 +925,7 @@ btn.addEventListener('click', () => {
         const map = L.map('map', {
             center: [39.5, -98.35],  // center of continental US
             zoom: startZoom,          // starting zoom
-            minZoom: 19        // restrict zoom out to starting zoom
+            minZoom: startZoom        // restrict zoom out to starting zoom
 
         });
 
